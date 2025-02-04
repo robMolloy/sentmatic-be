@@ -29,9 +29,9 @@ service cloud.firestore {
     //   return get(/databases/$(database)/documents/balances/$(id)).data;
     // }
 
-    function getFileDoc(id){
-      return get(/databases/$(database)/documents/files/$(id)).data;
-    }
+    // function getFileDoc(id){
+    //   return get(/databases/$(database)/documents/files/$(id)).data;
+    // }
 
     match /balanceDocs/{id} {
       function getBalanceDocKeys(){
@@ -70,16 +70,21 @@ service cloud.firestore {
         let incoming = getIncomingData();
         let existing = getExistingData();
         let diff = incoming.diff(existing);
+        let uploadIntentIdsDiff = incoming.uploadIntentIds.diff(existing.uploadIntentIds);
         let auth = getIncomingAuth();
-        let fileId = auth.uid + '_' + string(existing.couponStream) + '_' + string(existing.numberOfCoupons); 
-        let file = getFileDoc(fileId); 
+        let currentUploadIntentId = auth.uid + '_' + string(existing.currentUploadIntentNumber);
 
+        // BL.U.0.A
         return checkBalanceDocDataTypes() // BL.CDT.U
-          && diff.affectedKeys().hasOnly(['numberOfCoupons','updatedAt']) // BL.U.1.D
+          && diff.affectedKeys().hasOnly(['currentUploadIntentNumber','uploadIntentIds','updatedAt']) // BL.U.1.D
           && isNow(incoming.updatedAt) // BL.U.2.D
-          && incoming.numberOfCoupons == existing.numberOfCoupons - 300 // BL.U.3.D
-          && incoming.numberOfCoupons >= 0 // BL.U.4.D
-          && file.id == fileId
+          && incoming.value == existing.value - 300 // BL.U.3.D
+          && incoming.value >= 0 // BL.U.4.D
+          && incoming.currentUploadIntentNumber == existing.currentUploadIntentNumber + 1 // BL.U.5.D 
+          && uploadIntentIdsDiff.affectedKeys().hasOnly([currentUploadIntentId]) // BL.U.6.D
+          && uploadIntentIdsDiff.affectedKeys().hasAll([currentUploadIntentId]) // BL.U.7.D
+          && incoming.uploadIntentIds[currentUploadIntentId] == true // BL.U.8.D
+          
       }
 
       function canGetBalance(id){
