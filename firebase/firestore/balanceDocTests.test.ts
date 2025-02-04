@@ -588,12 +588,22 @@ describe("balanceDocTests", () => {
 
     const successDoc = updatifyDoc({ ...incrementBalanceDoc(balanceDoc2) });
     const newUploadIntentId = `${balanceDoc2.uid}_${successDoc.currentUploadIntentNumber}`;
-    const updatedDoc = {
+    const updatedDoc1 = {
       ...successDoc,
       uploadIntentIds: { ...successDoc.uploadIntentIds, [newUploadIntentId]: true },
     };
+    const updatedDoc2 = {
+      ...successDoc,
+      uploadIntentIds: { ...successDoc.uploadIntentIds, [newUploadIntentId]: "false" },
+    };
 
-    const result = await fsUtils.isRequestDenied(setDoc(docRef, updatedDoc));
-    expect(result.permissionDenied).toBe(true);
+    const promises = [
+      fsUtils.isRequestDenied(setDoc(docRef, updatedDoc1)),
+      fsUtils.isRequestDenied(setDoc(docRef, updatedDoc2)),
+    ];
+    const results = await Promise.all(promises);
+
+    const isAllDenied = results.every((x) => x.permissionDenied);
+    expect(isAllDenied).toBe(true);
   });
 });
