@@ -35,7 +35,7 @@ service cloud.firestore {
 
     match /balanceDocs/{id} {
       function getBalanceDocKeys(){
-        return ['id','uid','value','uploadIntentIds','createdAt','updatedAt'];
+        return ['id','uid','value','currentUploadIntentNumber','uploadIntentIds','createdAt','updatedAt'];
       }
       function checkBalanceDocDataTypes(){
         let incoming = getIncomingData();
@@ -51,11 +51,11 @@ service cloud.firestore {
           && incoming.uploadIntentIds is map // BL.CDT.7.D
           && incoming.createdAt is timestamp // BL.CDT.8.D
           && incoming.updatedAt is timestamp // BL.CDT.9.D
+          && incoming.currentUploadIntentNumber is number // BL.CDT.10.D
       }
 
       function canCreateBalance(){
         let incoming = getIncomingData();
-        let auth = getIncomingAuth();
 
         // BL.C.0.A
         return checkBalanceDocDataTypes() // BL.CDT.C
@@ -63,8 +63,9 @@ service cloud.firestore {
           && incoming.uploadIntentIds == {} // BL.C.2.D
           && isNow(incoming.createdAt) // BL.C.3.D
           && isNow(incoming.updatedAt) // BL.C.4.D
+          && incoming.currentUploadIntentNumber == 0 // BL.C.5.D
       }
-      
+
       function canUpdateBalance(){
         let incoming = getIncomingData();
         let existing = getExistingData();
@@ -73,11 +74,11 @@ service cloud.firestore {
         let fileId = auth.uid + '_' + string(existing.couponStream) + '_' + string(existing.numberOfCoupons); 
         let file = getFileDoc(fileId); 
 
-        return checkBalanceDocDataTypes()
-          && diff.affectedKeys().hasOnly(['numberOfCoupons','updatedAt'])
-          && isNow(incoming.updatedAt)
-          && incoming.numberOfCoupons == existing.numberOfCoupons - 1
-          && incoming.numberOfCoupons >= 0
+        return checkBalanceDocDataTypes() // BL.CDT.U
+          && diff.affectedKeys().hasOnly(['numberOfCoupons','updatedAt']) // BL.U.1.D
+          && isNow(incoming.updatedAt) // BL.U.2.D
+          && incoming.numberOfCoupons == existing.numberOfCoupons - 300 // BL.U.3.D
+          && incoming.numberOfCoupons >= 0 // BL.U.4.D
           && file.id == fileId
       }
 

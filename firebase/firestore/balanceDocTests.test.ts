@@ -18,6 +18,7 @@ const balanceDocSchema = z.object({
   id: z.string(),
   uid: z.string(),
   value: z.number(),
+  currentUploadIntentNumber: z.number(),
   uploadIntentIds: z.record(z.string(), z.boolean()),
   createdAt: timestampSchema,
   updatedAt: timestampSchema,
@@ -27,10 +28,12 @@ const balanceDoc1 = {
   id: "uid123",
   uid: "uid123",
   value: 0,
+  currentUploadIntentNumber: 0,
   uploadIntentIds: {},
   createdAt: Timestamp.now(),
   updatedAt: Timestamp.now(),
 } satisfies TBalanceDoc;
+
 const collectionNames = {
   balanceDocs: "balanceDocs",
 };
@@ -167,6 +170,15 @@ describe("balanceDocTests", () => {
     const isAllDenied = results.every((x) => x.permissionDenied);
     expect(isAllDenied).toBe(true);
   });
+  it(`BL.CDT.10.D.C - deny create access if docData.currentUploadIntentNumber is not a number (${collectionNames.balanceDocs})`, async () => {
+    const authedDb = testEnv.authenticatedContext(balanceDoc1.id).firestore();
+
+    const docRef1 = doc(authedDb, collectionNames.balanceDocs, balanceDoc1.id);
+    const newDoc1 = { ...creatifyDoc(balanceDoc1), currentUploadIntentNumber: "0" };
+
+    const results = await fsUtils.isRequestDenied(setDoc(docRef1, newDoc1));
+    expect(results.permissionDenied).toBe(true);
+  });
   it(`BL.C.1.D - deny create access if docData.value is not 0 (${collectionNames.balanceDocs})`, async () => {
     const authedDb = testEnv.authenticatedContext(balanceDoc1.id).firestore();
 
@@ -209,5 +221,14 @@ describe("balanceDocTests", () => {
 
     const result = await fsUtils.isRequestDenied(setDoc(docRef, newDoc));
     expect(result.permissionDenied).toBe(true);
+  });
+  it(`BL.C.5.D - deny create access if docData.currentUploadIntentNumber is not 0 (${collectionNames.balanceDocs})`, async () => {
+    const authedDb = testEnv.authenticatedContext(balanceDoc1.id).firestore();
+
+    const docRef1 = doc(authedDb, collectionNames.balanceDocs, balanceDoc1.id);
+    const newDoc1 = { ...creatifyDoc(balanceDoc1), currentUploadIntentNumber: 1 };
+
+    const results = await fsUtils.isRequestDenied(setDoc(docRef1, newDoc1));
+    expect(results.permissionDenied).toBe(true);
   });
 });
