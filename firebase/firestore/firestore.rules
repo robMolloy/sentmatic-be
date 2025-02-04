@@ -70,20 +70,20 @@ service cloud.firestore {
         let incoming = getIncomingData();
         let existing = getExistingData();
         let diff = incoming.diff(existing);
-        let uploadIntentIdsDiff = incoming.uploadIntentIds.diff(existing.uploadIntentIds);
+        let uploadIntentIdsDiff = existing.uploadIntentIds.diff(incoming.uploadIntentIds);
         let auth = getIncomingAuth();
-        let currentUploadIntentId = auth.uid + '_' + string(existing.currentUploadIntentNumber);
+        let currentUploadIntentId = auth.uid + '_' + string(incoming.currentUploadIntentNumber);
 
         // BL.U.0.A
         return checkBalanceDocDataTypes() // BL.CDT.U
-          && diff.affectedKeys().hasOnly(['currentUploadIntentNumber','uploadIntentIds','updatedAt']) // BL.U.1.D
+          && diff.affectedKeys().hasOnly(['value','currentUploadIntentNumber','uploadIntentIds','updatedAt']) // BL.U.1.D
           && isNow(incoming.updatedAt) // BL.U.2.D
           && incoming.value == existing.value - 300 // BL.U.3.D
           && incoming.value >= 0 // BL.U.4.D
           && incoming.currentUploadIntentNumber == existing.currentUploadIntentNumber + 1 // BL.U.5.D 
-          && uploadIntentIdsDiff.affectedKeys().hasOnly([currentUploadIntentId]) // BL.U.6.D
-          && uploadIntentIdsDiff.affectedKeys().hasAll([currentUploadIntentId]) // BL.U.7.D
-          && incoming.uploadIntentIds[currentUploadIntentId] == true // BL.U.8.D
+          && uploadIntentIdsDiff.affectedKeys().hasOnly([currentUploadIntentId]) // BL.U.6.D 
+          && uploadIntentIdsDiff.affectedKeys().hasAll([currentUploadIntentId]) // BL.U.7.D 
+          && incoming.uploadIntentIds[currentUploadIntentId] == false // BL.U.8.D
           
       }
 
