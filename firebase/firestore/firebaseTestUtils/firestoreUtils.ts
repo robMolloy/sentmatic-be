@@ -17,7 +17,7 @@ const getTimestampFromTimestampValue = (x: TTimestampValue) => {
 
 export const getNotNowTimestamp = () => {
   const now = Timestamp.now();
-  return { ...now, nanoseconds: now.nanoseconds - 1 };
+  return getTimestampFromTimestampValue({ ...now, nanoseconds: now.nanoseconds - 1 });
 };
 
 export const timestampSchema = z

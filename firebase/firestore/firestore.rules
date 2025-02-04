@@ -57,15 +57,14 @@ service cloud.firestore {
         let incoming = getIncomingData();
         let auth = getIncomingAuth();
 
-        // BL.CDT.0.A
-        return checkBalanceDocDataTypes()
-          && incoming.id == auth.uid
-          && incoming.uid == auth.uid
-          && incoming.value == 0
-          && incoming.uploadIntentIds == {}
-          && isNow(incoming.createdAt)
-          && isNow(incoming.updatedAt)
+        // BL.C.0.A
+        return checkBalanceDocDataTypes() // BL.CDT.C
+          && incoming.value == 0 // BL.C.1.D
+          && incoming.uploadIntentIds == {} // BL.C.2.D
+          && isNow(incoming.createdAt) // BL.C.3.D
+          && isNow(incoming.updatedAt) // BL.C.4.D
       }
+      
       function canUpdateBalance(){
         let incoming = getIncomingData();
         let existing = getExistingData();
