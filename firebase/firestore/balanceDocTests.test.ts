@@ -18,12 +18,12 @@ const incrementBalanceDoc = (p: TBalanceDoc) => {
   const nextUploadIntentNumber = p.currentUploadIntentNumber + 1;
   const nextUploadIntentId = `${p.uid}_${nextUploadIntentNumber}`;
 
-  return updatifyDoc({
+  return {
     ...p,
     value: p.value - 300,
     currentUploadIntentNumber: nextUploadIntentNumber,
     uploadIntentIds: { ...p.uploadIntentIds, [nextUploadIntentId]: false },
-  });
+  };
 };
 
 let testEnv: RulesTestEnvironment;
@@ -273,7 +273,7 @@ describe("balanceDocTests", () => {
     const authedDb = testEnv.authenticatedContext(balanceDoc2.id).firestore();
     const docRef = doc(authedDb, collectionNames.balanceDocs, balanceDoc2.id);
 
-    const updatedDoc = incrementBalanceDoc(balanceDoc2);
+    const updatedDoc = updatifyDoc(incrementBalanceDoc(balanceDoc2));
     const createDocKeys = Object.keys(updatedDoc) as (keyof TBalanceDoc)[];
     const missingKeyDocs = createDocKeys.map((key) => removeKey(key, updatedDoc));
 
@@ -289,7 +289,7 @@ describe("balanceDocTests", () => {
     });
     const authedDb = testEnv.authenticatedContext(balanceDoc2.id).firestore();
     const docRef = doc(authedDb, collectionNames.balanceDocs, balanceDoc2.id);
-    const updatedDoc = incrementBalanceDoc(balanceDoc2);
+    const updatedDoc = updatifyDoc(incrementBalanceDoc(balanceDoc2));
 
     const additionalKeyDoc = { ...updatedDoc, addKey: "addKey" };
 
@@ -303,7 +303,7 @@ describe("balanceDocTests", () => {
     });
     const authedDb = testEnv.authenticatedContext(balanceDoc2.id).firestore();
 
-    const updatedDoc = incrementBalanceDoc(balanceDoc2);
+    const updatedDoc = updatifyDoc(incrementBalanceDoc(balanceDoc2));
     const docRef1 = doc(authedDb, collectionNames.balanceDocs, balanceDoc2.id);
     const newDoc1 = { ...updatedDoc, id: "randomId" };
 
@@ -326,7 +326,7 @@ describe("balanceDocTests", () => {
     const authedDb = testEnv.authenticatedContext("randomId").firestore();
     const docRef = doc(authedDb, collectionNames.balanceDocs, balanceDoc2.id);
 
-    const updatedDoc = incrementBalanceDoc(balanceDoc2);
+    const updatedDoc = updatifyDoc(incrementBalanceDoc(balanceDoc2));
 
     const result = await fsUtils.isRequestDenied(setDoc(docRef, updatedDoc));
     expect(result.permissionDenied).toBe(true);
@@ -339,7 +339,9 @@ describe("balanceDocTests", () => {
     const authedDb = testEnv.authenticatedContext(balanceDoc2.uid).firestore();
     const docRef = doc(authedDb, collectionNames.balanceDocs, balanceDoc2.id);
 
-    const updatedDoc = incrementBalanceDoc({ ...balanceDoc2, uid: `${balanceDoc2.uid}_` });
+    const updatedDoc = updatifyDoc(
+      incrementBalanceDoc({ ...balanceDoc2, uid: `${balanceDoc2.uid}_` })
+    );
 
     const result = await fsUtils.isRequestDenied(setDoc(docRef, updatedDoc));
     expect(result.permissionDenied).toBe(true);
@@ -352,7 +354,7 @@ describe("balanceDocTests", () => {
     const authedDb = testEnv.authenticatedContext(balanceDoc2.uid).firestore();
     const docRef = doc(authedDb, collectionNames.balanceDocs, balanceDoc2.id);
 
-    const updatedDoc = { ...incrementBalanceDoc({ ...balanceDoc2 }), value: `0` };
+    const updatedDoc = updatifyDoc({ ...incrementBalanceDoc({ ...balanceDoc2 }), value: `0` });
 
     const result = await fsUtils.isRequestDenied(setDoc(docRef, updatedDoc));
     expect(result.permissionDenied).toBe(true);
@@ -365,9 +367,12 @@ describe("balanceDocTests", () => {
     const authedDb = testEnv.authenticatedContext(balanceDoc2.id).firestore();
 
     const docRef1 = doc(authedDb, collectionNames.balanceDocs, balanceDoc2.id);
-    const updatedDoc1 = { ...incrementBalanceDoc(balanceDoc2), uploadIntentIds: "" };
+    const updatedDoc1 = updatifyDoc({ ...incrementBalanceDoc(balanceDoc2), uploadIntentIds: "" });
     const docRef2 = doc(authedDb, collectionNames.balanceDocs, balanceDoc2.id);
-    const updatedDoc2 = { ...incrementBalanceDoc(balanceDoc2), uploadIntentIds: { id1: true } };
+    const updatedDoc2 = updatifyDoc({
+      ...incrementBalanceDoc(balanceDoc2),
+      uploadIntentIds: { id1: true },
+    });
 
     const promises = [
       fsUtils.isRequestDenied(setDoc(docRef1, updatedDoc1)),
@@ -385,9 +390,12 @@ describe("balanceDocTests", () => {
     const authedDb = testEnv.authenticatedContext(balanceDoc2.id).firestore();
 
     const docRef1 = doc(authedDb, collectionNames.balanceDocs, balanceDoc2.id);
-    const updatedDoc1 = { ...incrementBalanceDoc(balanceDoc2), createdAt: "" };
+    const updatedDoc1 = { ...updatifyDoc({ ...incrementBalanceDoc(balanceDoc2) }), createdAt: "" };
     const docRef2 = doc(authedDb, collectionNames.balanceDocs, balanceDoc2.id);
-    const updatedDoc2 = { ...incrementBalanceDoc(balanceDoc2), createdAt: getNotNowTimestamp() };
+    const updatedDoc2 = {
+      ...updatifyDoc({ ...incrementBalanceDoc(balanceDoc2) }),
+      createdAt: getNotNowTimestamp(),
+    };
 
     const promises = [
       fsUtils.isRequestDenied(setDoc(docRef1, updatedDoc1)),
@@ -405,9 +413,12 @@ describe("balanceDocTests", () => {
     const authedDb = testEnv.authenticatedContext(balanceDoc2.id).firestore();
 
     const docRef1 = doc(authedDb, collectionNames.balanceDocs, balanceDoc2.id);
-    const updatedDoc1 = { ...incrementBalanceDoc(balanceDoc2), updatedAt: "" };
+    const updatedDoc1 = { ...updatifyDoc({ ...incrementBalanceDoc(balanceDoc2) }), updatedAt: "" };
     const docRef2 = doc(authedDb, collectionNames.balanceDocs, balanceDoc2.id);
-    const updatedDoc2 = { ...incrementBalanceDoc(balanceDoc2), updatedAt: getNotNowTimestamp() };
+    const updatedDoc2 = {
+      ...updatifyDoc({ ...incrementBalanceDoc(balanceDoc2) }),
+      updatedAt: getNotNowTimestamp(),
+    };
 
     const promises = [
       fsUtils.isRequestDenied(setDoc(docRef1, updatedDoc1)),
@@ -425,7 +436,10 @@ describe("balanceDocTests", () => {
     const authedDb = testEnv.authenticatedContext(balanceDoc2.id).firestore();
 
     const docRef1 = doc(authedDb, collectionNames.balanceDocs, balanceDoc2.id);
-    const newDoc1 = { ...incrementBalanceDoc(balanceDoc2), currentUploadIntentNumber: "0" };
+    const newDoc1 = updatifyDoc({
+      ...incrementBalanceDoc(balanceDoc2),
+      currentUploadIntentNumber: "0",
+    });
 
     const results = await fsUtils.isRequestDenied(setDoc(docRef1, newDoc1));
     expect(results.permissionDenied).toBe(true);
