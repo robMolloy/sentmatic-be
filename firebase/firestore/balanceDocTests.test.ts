@@ -25,6 +25,12 @@ const incrementBalanceDoc = (p: TBalanceDoc) => {
     uploadIntentIds: { ...p.uploadIntentIds, [nextUploadIntentId]: false },
   };
 };
+const updatableKeys = [
+  "value",
+  "currentUploadIntentNumber",
+  "uploadIntentIds",
+  "updatedAt",
+] as const;
 
 let testEnv: RulesTestEnvironment;
 const balanceDocSchema = z.object({
@@ -52,6 +58,15 @@ const balanceDoc2 = {
   value: 1000,
   currentUploadIntentNumber: 1,
   uploadIntentIds: { uid124_1: true },
+  createdAt: Timestamp.now(),
+  updatedAt: Timestamp.now(),
+} as const satisfies TBalanceDoc;
+const balanceDoc3 = {
+  id: "uid125",
+  uid: "uid125",
+  value: 200,
+  currentUploadIntentNumber: 1,
+  uploadIntentIds: { uid125_1: true },
   createdAt: Timestamp.now(),
   updatedAt: Timestamp.now(),
 } as const satisfies TBalanceDoc;
@@ -436,12 +451,149 @@ describe("balanceDocTests", () => {
     const authedDb = testEnv.authenticatedContext(balanceDoc2.id).firestore();
 
     const docRef1 = doc(authedDb, collectionNames.balanceDocs, balanceDoc2.id);
-    const newDoc1 = updatifyDoc({
+    const updatedDoc1 = updatifyDoc({
       ...incrementBalanceDoc(balanceDoc2),
       currentUploadIntentNumber: "0",
     });
 
-    const results = await fsUtils.isRequestDenied(setDoc(docRef1, newDoc1));
+    const results = await fsUtils.isRequestDenied(setDoc(docRef1, updatedDoc1));
     expect(results.permissionDenied).toBe(true);
+  });
+  it(`BL.U.1.D - deny update access if docData has an updatable key missing (${collectionNames.balanceDocs})`, async () => {
+    await testEnv.withSecurityRulesDisabled(async (context) => {
+      const docRef = doc(context.firestore(), collectionNames.balanceDocs, balanceDoc2.id);
+      await setDoc(docRef, balanceDoc2);
+    });
+    const authedDb = testEnv.authenticatedContext(balanceDoc2.id).firestore();
+    const docRef = doc(authedDb, collectionNames.balanceDocs, balanceDoc2.id);
+
+    const successDoc = updatifyDoc({ ...incrementBalanceDoc(balanceDoc2) });
+
+    const missingKeyDocs = updatableKeys.map((key) => removeKey(key, successDoc));
+    const promises = missingKeyDocs.map((x) => fsUtils.isRequestDenied(setDoc(docRef, x)));
+    const results = await Promise.all(promises);
+
+    const isAllDenied = results.every((x) => x.permissionDenied);
+    expect(isAllDenied).toBe(true);
+  });
+  it(`BL.U.2.D - deny update access if docData has an additional key (${collectionNames.balanceDocs})`, async () => {
+    await testEnv.withSecurityRulesDisabled(async (context) => {
+      const docRef = doc(context.firestore(), collectionNames.balanceDocs, balanceDoc2.id);
+      await setDoc(docRef, balanceDoc2);
+    });
+    const authedDb = testEnv.authenticatedContext(balanceDoc2.id).firestore();
+    const docRef = doc(authedDb, collectionNames.balanceDocs, balanceDoc2.id);
+
+    const successDoc = updatifyDoc({ ...incrementBalanceDoc(balanceDoc2) });
+    const addKeyDoc = { ...successDoc, newKey: "newValue" };
+
+    const result = await fsUtils.isRequestDenied(setDoc(docRef, addKeyDoc));
+    expect(result.permissionDenied).toBe(true);
+  });
+  it(`BL.U.3.D - deny update access if docData.updatedAt is not now (${collectionNames.balanceDocs})`, async () => {
+    await testEnv.withSecurityRulesDisabled(async (context) => {
+      const docRef = doc(context.firestore(), collectionNames.balanceDocs, balanceDoc2.id);
+      await setDoc(docRef, balanceDoc2);
+    });
+    const authedDb = testEnv.authenticatedContext(balanceDoc2.id).firestore();
+    const docRef = doc(authedDb, collectionNames.balanceDocs, balanceDoc2.id);
+
+    const successDoc = updatifyDoc({ ...incrementBalanceDoc(balanceDoc2) });
+    const updatedDoc = { ...successDoc, updatedAt: getNotNowTimestamp() };
+
+    const result = await fsUtils.isRequestDenied(setDoc(docRef, updatedDoc));
+    expect(result.permissionDenied).toBe(true);
+  });
+  it(`BL.U.4.D - deny update access if docData.value is not existing.value-300 (${collectionNames.balanceDocs})`, async () => {
+    await testEnv.withSecurityRulesDisabled(async (context) => {
+      const docRef = doc(context.firestore(), collectionNames.balanceDocs, balanceDoc2.id);
+      await setDoc(docRef, balanceDoc2);
+    });
+    const authedDb = testEnv.authenticatedContext(balanceDoc2.id).firestore();
+    const docRef = doc(authedDb, collectionNames.balanceDocs, balanceDoc2.id);
+
+    const successDoc = updatifyDoc({ ...incrementBalanceDoc(balanceDoc2) });
+    const updatedDoc = { ...successDoc, value: successDoc.value + 1 };
+
+    const result = await fsUtils.isRequestDenied(setDoc(docRef, updatedDoc));
+    expect(result.permissionDenied).toBe(true);
+  });
+  it(`BL.U.5.D - deny update access if docData.value is < 0 (${collectionNames.balanceDocs})`, async () => {
+    await testEnv.withSecurityRulesDisabled(async (context) => {
+      const docRef = doc(context.firestore(), collectionNames.balanceDocs, balanceDoc3.id);
+      await setDoc(docRef, balanceDoc3);
+    });
+    const authedDb = testEnv.authenticatedContext(balanceDoc3.id).firestore();
+    const docRef = doc(authedDb, collectionNames.balanceDocs, balanceDoc3.id);
+
+    const updatedDoc = updatifyDoc({ ...incrementBalanceDoc(balanceDoc3) });
+
+    const result = await fsUtils.isRequestDenied(setDoc(docRef, updatedDoc));
+    expect(result.permissionDenied).toBe(true);
+  });
+  it(`BL.U.6.D - deny update access if docData.currentUploadIntentNumber is not existing.currentUploadIntentNumber+1 (${collectionNames.balanceDocs})`, async () => {
+    await testEnv.withSecurityRulesDisabled(async (context) => {
+      const docRef = doc(context.firestore(), collectionNames.balanceDocs, balanceDoc2.id);
+      await setDoc(docRef, balanceDoc2);
+    });
+    const authedDb = testEnv.authenticatedContext(balanceDoc2.id).firestore();
+    const docRef = doc(authedDb, collectionNames.balanceDocs, balanceDoc2.id);
+
+    const successDoc = updatifyDoc({ ...incrementBalanceDoc(balanceDoc2) });
+    const updatedDoc = {
+      ...successDoc,
+      currentUploadIntentNumber: successDoc.currentUploadIntentNumber + 1,
+    };
+
+    const result = await fsUtils.isRequestDenied(setDoc(docRef, updatedDoc));
+    expect(result.permissionDenied).toBe(true);
+  });
+  it(`BL.U.7.D - deny update access if docData.uploadIntentIds has additional key (${collectionNames.balanceDocs})`, async () => {
+    await testEnv.withSecurityRulesDisabled(async (context) => {
+      const docRef = doc(context.firestore(), collectionNames.balanceDocs, balanceDoc2.id);
+      await setDoc(docRef, balanceDoc2);
+    });
+    const authedDb = testEnv.authenticatedContext(balanceDoc2.id).firestore();
+    const docRef = doc(authedDb, collectionNames.balanceDocs, balanceDoc2.id);
+
+    const successDocPreUpdate = { ...incrementBalanceDoc(balanceDoc2) };
+    const successDoc = updatifyDoc({ ...successDocPreUpdate });
+    const extraDocPreUpdate = { ...incrementBalanceDoc(successDocPreUpdate) };
+    const updatedDoc = { ...successDoc, uploadIntentIds: extraDocPreUpdate.uploadIntentIds };
+
+    const result = await fsUtils.isRequestDenied(setDoc(docRef, updatedDoc));
+    expect(result.permissionDenied).toBe(true);
+  });
+  it(`BL.U.8.D - deny update access if docData.uploadIntentIds is missing key (${collectionNames.balanceDocs})`, async () => {
+    await testEnv.withSecurityRulesDisabled(async (context) => {
+      const docRef = doc(context.firestore(), collectionNames.balanceDocs, balanceDoc2.id);
+      await setDoc(docRef, balanceDoc2);
+    });
+    const authedDb = testEnv.authenticatedContext(balanceDoc2.id).firestore();
+    const docRef = doc(authedDb, collectionNames.balanceDocs, balanceDoc2.id);
+
+    const successDoc = updatifyDoc({ ...incrementBalanceDoc(balanceDoc2) });
+    const updatedDoc = { ...successDoc, uploadIntentIds: balanceDoc2.uploadIntentIds };
+
+    const result = await fsUtils.isRequestDenied(setDoc(docRef, updatedDoc));
+    expect(result.permissionDenied).toBe(true);
+  });
+  it(`BL.U.9.D - deny update access if docData.uploadIntentIds new key != false (${collectionNames.balanceDocs})`, async () => {
+    await testEnv.withSecurityRulesDisabled(async (context) => {
+      const docRef = doc(context.firestore(), collectionNames.balanceDocs, balanceDoc2.id);
+      await setDoc(docRef, balanceDoc2);
+    });
+    const authedDb = testEnv.authenticatedContext(balanceDoc2.id).firestore();
+    const docRef = doc(authedDb, collectionNames.balanceDocs, balanceDoc2.id);
+
+    const successDoc = updatifyDoc({ ...incrementBalanceDoc(balanceDoc2) });
+    const newUploadIntentId = `${balanceDoc2.uid}_${successDoc.currentUploadIntentNumber}`;
+    const updatedDoc = {
+      ...successDoc,
+      uploadIntentIds: { ...successDoc.uploadIntentIds, [newUploadIntentId]: true },
+    };
+
+    const result = await fsUtils.isRequestDenied(setDoc(docRef, updatedDoc));
+    expect(result.permissionDenied).toBe(true);
   });
 });
