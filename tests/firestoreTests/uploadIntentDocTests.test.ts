@@ -1,15 +1,15 @@
 import { RulesTestEnvironment } from "@firebase/rules-unit-testing";
 import { doc, setDoc } from "firebase/firestore";
-import * as fsUtils from "./firebaseTestUtils/firebaseTestUtils";
 import { collectionNames, uploadIntentDoc1 } from "./mocks/mockData";
 import { creatifyDoc } from "@/utils/firestoreUtils";
+import { fbTestUtils } from "@/utils/firebaseTestUtils";
 
 let testEnv: RulesTestEnvironment;
 
 describe("balanceDocTests", () => {
   beforeAll(async () => {
-    fsUtils.setDefaultLogLevel();
-    testEnv = await fsUtils.createTestEnvironment({ projectId: "demo-project" });
+    fbTestUtils.setDefaultLogLevel();
+    testEnv = await fbTestUtils.createTestEnvironment({ projectId: "demo-project" });
   });
   beforeEach(async () => {
     await testEnv.clearFirestore();
@@ -22,7 +22,9 @@ describe("balanceDocTests", () => {
     const authedDb = testEnv.authenticatedContext(uploadIntentDoc1.uid).firestore();
     const docRef = doc(authedDb, collectionNames.uploadIntentDocs, uploadIntentDoc1.id);
 
-    const result = await fsUtils.isRequestGranted(setDoc(docRef, creatifyDoc(uploadIntentDoc1)));
+    const result = await fbTestUtils.isRequestGranted(
+      setDoc(docRef, creatifyDoc(uploadIntentDoc1))
+    );
     expect(result.permissionGranted).toBe(true);
   });
 });
