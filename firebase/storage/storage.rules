@@ -14,7 +14,7 @@ function getIncomingAuth() {
 //    /databases/(default)/documents/users/$(request.auth.uid)).data.isAdmin;
 service firebase.storage {
   match /b/{bucket}/o {
-    match /files/{id} {
+    match /uploads/{id} {
       function canCreateFile(id){
         let firestoreFileData = getFirestoreFileData(id);
         let auth = getIncomingAuth();
