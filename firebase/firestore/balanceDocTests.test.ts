@@ -1,5 +1,5 @@
 import { RulesTestEnvironment } from "@firebase/rules-unit-testing";
-import { doc, setDoc, Timestamp } from "firebase/firestore";
+import { getDoc, doc, setDoc, Timestamp } from "firebase/firestore";
 import { z } from "zod";
 import * as fsUtils from "./firebaseTestUtils/firebaseTestUtils";
 import {
@@ -605,5 +605,27 @@ describe("balanceDocTests", () => {
 
     const isAllDenied = results.every((x) => x.permissionDenied);
     expect(isAllDenied).toBe(true);
+  });
+  it(`BL.G.0.A - allow get access if id == auth.uid (${collectionNames.balanceDocs})`, async () => {
+    await testEnv.withSecurityRulesDisabled(async (context) => {
+      const docRef = doc(context.firestore(), collectionNames.balanceDocs, balanceDoc2.id);
+      await setDoc(docRef, balanceDoc2);
+    });
+    const authedDb = testEnv.authenticatedContext(balanceDoc2.id).firestore();
+    const docRef = doc(authedDb, collectionNames.balanceDocs, balanceDoc2.id);
+
+    const result = await fsUtils.isRequestGranted(getDoc(docRef));
+    expect(result.permissionGranted).toBe(true);
+  });
+  it(`BL.G.1.D - deny get access if id != auth.uid (${collectionNames.balanceDocs})`, async () => {
+    await testEnv.withSecurityRulesDisabled(async (context) => {
+      const docRef = doc(context.firestore(), collectionNames.balanceDocs, balanceDoc2.id);
+      await setDoc(docRef, balanceDoc2);
+    });
+    const authedDb = testEnv.authenticatedContext(`${balanceDoc2.id}_`).firestore();
+    const docRef = doc(authedDb, collectionNames.balanceDocs, balanceDoc2.id);
+
+    const result = await fsUtils.isRequestDenied(getDoc(docRef));
+    expect(result.permissionDenied).toBe(true);
   });
 });

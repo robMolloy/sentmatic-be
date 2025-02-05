@@ -88,15 +88,46 @@ service cloud.firestore {
           && incoming.uploadIntentIds[currentUploadIntentId] == false // BL.U.9.D
       }
 
-      function canGetBalance(id){
+      function canGetBalance(){
         let auth = getIncomingAuth();
+        let existing = getExistingData();
 
-        return id == auth.uid
+        // BL.G.0.A
+        return existing.id == auth.uid // BL.G.1.D
       }
       
       allow create: if canCreateBalance();
       allow update: if canUpdateBalance();
-      allow get: if canGetBalance(id);
+      allow get: if canGetBalance();
+      allow list: if false;
+      allow delete: if false;
+    }
+    match /uploadIntentDocs/{id} {
+      function getUploadIntentDocKeys(){
+        return ['id', 'uid', 'createdAt', 'updatedAt'];
+      }
+
+      function checkUploadIntentDocDataTypes(){
+        let incoming = getIncomingData();
+        let keys = getUploadIntentDocKeys();
+
+        return incoming.keys().hasAll(keys)
+          && incoming.keys().hasOnly(keys)
+          && incoming.id == getIncomingId()
+          && incoming.uid == getIncomingAuth().uid
+          && incoming.createdAt is timestamp
+          && incoming.updatedAt is timestamp
+      }
+      function canCreateUploadIntentDoc() {
+        // UI.C.0.A
+        return checkUploadIntentDocDataTypes() // UI.C.1.D
+      }
+      // allow create: if false;
+      allow create: if canCreateUploadIntentDoc();
+      allow update: if false;
+      // allow update: if canUpdateUploadIntentDoc();
+      allow get: if false;
+      // allow get: if canGetUploadIntentDoc();
       allow list: if false;
       allow delete: if false;
     }
