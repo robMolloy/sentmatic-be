@@ -21,7 +21,7 @@ service firebase.storage {
           && firestoreFileData.uid == auth.uid
           && request.resource.size < 50*1024*1024
       }
-      
+
       // function canGetFile(id){
       //   let firestoreFileData = getFirestoreUploadIntentDocData(id);
       //   let auth = getIncomingAuth();

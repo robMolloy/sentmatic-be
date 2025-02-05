@@ -5,21 +5,11 @@ import { uploadIntentDoc1 } from "@/mocks/mockData";
 import { doc, setDoc } from "firebase/firestore";
 import { ref, uploadBytes } from "firebase/storage";
 
-import { convertPngArrayBufferToBlob } from "@/utils/dataTypeUtils";
-import { isRequestGranted } from "@/utils/firebaseTestUtils/firebaseTestUtils";
-import { readFileSync } from "fs";
-import path from "path";
 import { firestoreCollectionNames } from "@/mocks/metadata";
+import { isRequestGranted } from "@/utils/firebaseTestUtils/firebaseTestUtils";
+import { getQrCodeFileBlob } from "@/mocks/storageMockData";
 
 let testEnv: RulesTestEnvironment;
-
-let qrCodeFileBlob: Blob;
-const getQrCodeFileBlob = () => {
-  if (qrCodeFileBlob) return qrCodeFileBlob;
-  const buffer = readFileSync(path.resolve("./tests/mocks/qrcode.png"));
-  qrCodeFileBlob = convertPngArrayBufferToBlob({ buffer, mimeType: "image/png" });
-  return qrCodeFileBlob;
-};
 
 describe("uploadTests", () => {
   beforeAll(async () => {
