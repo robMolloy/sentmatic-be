@@ -5,7 +5,7 @@ import { uploadIntentDoc1 } from "@/mocks/mockData";
 import { doc, setDoc } from "firebase/firestore";
 import { ref, uploadBytes } from "firebase/storage";
 
-import { firestoreCollectionNames } from "@/mocks/metadata";
+import { firestoreCollectionNames, storageCollectionNames } from "@/mocks/metadata";
 import { isRequestGranted } from "@/utils/firebaseTestUtils/firebaseTestUtils";
 import { getQrCodeFileBlob } from "@/mocks/storageMockData";
 
@@ -33,7 +33,7 @@ describe("uploadTests", () => {
     const authedStorage = testEnv.authenticatedContext(uploadIntentDoc1.uid).storage();
     const qrCodeFileBlob = getQrCodeFileBlob();
 
-    const storageRef = ref(authedStorage, `uploadFiles/${uploadIntentDoc1.id}`);
+    const storageRef = ref(authedStorage, `${storageCollectionNames.files}/${uploadIntentDoc1.id}`);
     const result = await isRequestGranted(uploadBytes(storageRef, qrCodeFileBlob));
 
     expect(result.permissionGranted).toBe(true);

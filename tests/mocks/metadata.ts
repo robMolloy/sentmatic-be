@@ -3,5 +3,5 @@ export const firestoreCollectionNames = {
   uploadIntentDocs: "uploadIntentDocs",
 };
 export const storageCollectionNames = {
-  uploadFiles: "uploadFiles",
+  files: "files",
 };

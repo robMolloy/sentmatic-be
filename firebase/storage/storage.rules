@@ -12,7 +12,7 @@ function getIncomingAuth() {
 
 service firebase.storage {
   match /b/{bucket}/o {
-    match /uploadFiles/{id} {
+    match /files/{id} {
       function canCreateUploadFile(id){
         let firestoreFileData = getFirestoreUploadIntentDocData(id);
         let auth = getIncomingAuth();
