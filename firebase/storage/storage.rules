@@ -3,7 +3,8 @@ function getIncomingData() {
   return request.resource;
 }
 function getFirestoreUploadIntentDocData(id) {
-  return firestore.get(/databases/(default)/documents/uploadIntentDocs/$(id)).data;
+  let doc1 = firestore.get(/databases/(default)/documents/uploadIntentDocs/$(id));
+  return doc1 == null ? null : doc1.data;
 }
 function getIncomingAuth() {
   return request.auth;
@@ -16,7 +17,7 @@ service firebase.storage {
         let firestoreFileData = getFirestoreUploadIntentDocData(id);
         let auth = getIncomingAuth();
 
-        return firestoreFileData.id != null
+        return firestoreFileData != null
           && firestoreFileData.uid == auth.uid
           && request.resource.size < 50*1024*1024
       }
