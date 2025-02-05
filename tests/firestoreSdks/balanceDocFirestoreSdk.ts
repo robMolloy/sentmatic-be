@@ -12,7 +12,7 @@ const balanceDocSchema = z.object({
 });
 export type TBalanceDoc = z.infer<typeof balanceDocSchema>;
 
-export const updatableKeys = [
+export const updatableBalanceDocKeys = [
   "value",
   "currentUploadIntentNumber",
   "uploadIntentIds",

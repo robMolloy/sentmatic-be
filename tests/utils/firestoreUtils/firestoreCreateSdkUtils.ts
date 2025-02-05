@@ -1,8 +1,9 @@
 import {
-  deleteDoc,
   addDoc,
   collection,
+  deleteDoc,
   doc,
+  Firestore,
   getDoc,
   getDocs,
   query,
@@ -12,9 +13,8 @@ import {
 } from "firebase/firestore";
 import { z } from "zod";
 import { fbTestUtils } from "../firebaseTestUtils";
-import { RulesTestEnvironment } from "@firebase/rules-unit-testing";
 
-export type TDb = ReturnType<ReturnType<RulesTestEnvironment["authenticatedContext"]>["firestore"]>;
+export type TDb = Firestore;
 
 export const createSdk = <T1 extends { id: string }>(x: { collectionName: string }) => ({
   addDoc: (p: { db: TDb; data: T1 }) => {

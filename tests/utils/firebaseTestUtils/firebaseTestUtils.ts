@@ -7,11 +7,6 @@ import { DocumentData, DocumentSnapshot, QuerySnapshot, setLogLevel } from "fire
 import { readFileSync } from "fs";
 import path from "path";
 
-export const removeKey = <T extends object, K extends keyof T>(key: K, object: T): Omit<T, K> => {
-  const { [key]: _, ...rest } = object;
-  return rest;
-};
-
 export const setDefaultLogLevel = () => setLogLevel("error");
 
 export const createTestEnvironment = async (p: { projectId: string }) => {
@@ -84,3 +79,8 @@ export async function isRequestGranted<T extends Promise<unknown>>(promise: T) {
     return { permissionDenied: true, permissionGranted: false } as const;
   }
 }
+
+export const removeKey = <T extends object, K extends keyof T>(key: K, object: T): Omit<T, K> => {
+  const { [key]: _, ...rest } = object;
+  return rest;
+};

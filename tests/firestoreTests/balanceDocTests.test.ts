@@ -2,12 +2,12 @@ import { fbTestUtils, fsTestUtils } from "@/utils/firebaseTestUtils";
 import { creatifyDoc, getNotNowTimestamp, updatifyDoc } from "@/utils/firestoreUtils";
 import { RulesTestEnvironment } from "@firebase/rules-unit-testing";
 import { doc, getDoc, setDoc } from "firebase/firestore";
+import { balanceDoc1, balanceDoc2, balanceDoc3, collectionNames } from "./mocks/mockData";
 import {
   incrementBalanceDoc,
   TBalanceDoc,
-  updatableKeys,
-} from "./firestoreSdks/balanceDocFirestoreSdk";
-import { balanceDoc1, balanceDoc2, balanceDoc3, collectionNames } from "./mocks/mockData";
+  updatableBalanceDocKeys,
+} from "@/firestoreSdks/balanceDocFirestoreSdk";
 
 let testEnv: RulesTestEnvironment;
 
@@ -407,7 +407,9 @@ describe("balanceDocTests", () => {
 
     const successDoc = updatifyDoc({ ...incrementBalanceDoc(balanceDoc2) });
 
-    const missingKeyDocs = updatableKeys.map((key) => fsTestUtils.removeKey(key, successDoc));
+    const missingKeyDocs = updatableBalanceDocKeys.map((key) =>
+      fsTestUtils.removeKey(key, successDoc)
+    );
     const promises = missingKeyDocs.map((x) => fsTestUtils.isRequestDenied(setDoc(docRef, x)));
     const results = await Promise.all(promises);
 
