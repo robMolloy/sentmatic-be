@@ -1,28 +1,10 @@
 import { RulesTestEnvironment } from "@firebase/rules-unit-testing";
-import { doc, setDoc, Timestamp } from "firebase/firestore";
-import z from "zod";
+import { doc, setDoc } from "firebase/firestore";
 import * as fsUtils from "./firebaseTestUtils/firebaseTestUtils";
-import { creatifyDoc, timestampSchema } from "./firebaseTestUtils/firestoreUtils";
+import { collectionNames, uploadIntentDoc1 } from "./mocks/mockData";
+import { creatifyDoc } from "@/utils/firestoreUtils";
 
 let testEnv: RulesTestEnvironment;
-const uploadIntentDocSchema = z.object({
-  id: z.string(),
-  uid: z.string(),
-  createdAt: timestampSchema,
-  updatedAt: timestampSchema,
-});
-type TUploadIntentDoc = z.infer<typeof uploadIntentDocSchema>;
-const uploadIntentDoc1 = {
-  id: "uid123_1",
-  uid: "uid123",
-  createdAt: Timestamp.now(),
-  updatedAt: Timestamp.now(),
-} as const satisfies TUploadIntentDoc;
-
-const collectionNames = {
-  balanceDocs: "balanceDocs",
-  uploadIntentDocs: "uploadIntentDocs",
-};
 
 describe("balanceDocTests", () => {
   beforeAll(async () => {

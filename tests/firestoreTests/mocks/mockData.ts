@@ -1,10 +1,26 @@
+import { timestampSchema } from "@/utils/firestoreUtils";
 import { Timestamp } from "firebase/firestore";
 import { z } from "zod";
-import { timestampSchema } from "../firebaseTestUtils/firestoreUtils";
 
 export const collectionNames = {
   balanceDocs: "balanceDocs",
+  uploadIntentDocs: "uploadIntentDocs",
 };
+
+const uploadIntentDocSchema = z.object({
+  id: z.string(),
+  uid: z.string(),
+  createdAt: timestampSchema,
+  updatedAt: timestampSchema,
+});
+type TUploadIntentDoc = z.infer<typeof uploadIntentDocSchema>;
+
+export const uploadIntentDoc1 = {
+  id: "uid123_1",
+  uid: "uid123",
+  createdAt: Timestamp.now(),
+  updatedAt: Timestamp.now(),
+} as const satisfies TUploadIntentDoc;
 
 const balanceDocSchema = z.object({
   id: z.string(),

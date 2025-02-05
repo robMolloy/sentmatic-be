@@ -1,13 +1,13 @@
 import { RulesTestEnvironment } from "@firebase/rules-unit-testing";
 import { doc, getDoc, setDoc } from "firebase/firestore";
 import { fbTestUtils } from "./firebaseTestUtils";
-import { creatifyDoc, getNotNowTimestamp, updatifyDoc } from "./firebaseTestUtils/firestoreUtils";
 import {
   incrementBalanceDoc,
   TBalanceDoc,
   updatableKeys,
 } from "./firestoreSdks/balanceDocFirestoreSdk";
 import { balanceDoc1, balanceDoc2, balanceDoc3, collectionNames } from "./mocks/mockData";
+import { creatifyDoc, getNotNowTimestamp, updatifyDoc } from "@/utils/firestoreUtils";
 
 let testEnv: RulesTestEnvironment;
 
