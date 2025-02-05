@@ -1,30 +1,10 @@
 import { RulesTestEnvironment } from "@firebase/rules-unit-testing";
-import { getDoc, doc, setDoc, Timestamp } from "firebase/firestore";
-import { z } from "zod";
+import { doc, getDoc, setDoc } from "firebase/firestore";
 import * as fsUtils from "./firebaseTestUtils/firebaseTestUtils";
-import {
-  creatifyDoc,
-  getNotNowTimestamp,
-  timestampSchema,
-  updatifyDoc,
-} from "./firebaseTestUtils/firestoreUtils";
+import { creatifyDoc, getNotNowTimestamp, updatifyDoc } from "./firebaseTestUtils/firestoreUtils";
+import { incrementBalanceDoc, TBalanceDoc } from "./firestoreSdks/balanceDocFirestoreSdk";
+import { balanceDoc1, balanceDoc2, balanceDoc3, collectionNames } from "./mocks/mockData";
 
-export const removeKey = <T extends object, K extends keyof T>(key: K, object: T): Omit<T, K> => {
-  const { [key]: _, ...rest } = object;
-  return rest;
-};
-
-const incrementBalanceDoc = (p: TBalanceDoc) => {
-  const nextUploadIntentNumber = p.currentUploadIntentNumber + 1;
-  const nextUploadIntentId = `${p.uid}_${nextUploadIntentNumber}`;
-
-  return {
-    ...p,
-    value: p.value - 300,
-    currentUploadIntentNumber: nextUploadIntentNumber,
-    uploadIntentIds: { ...p.uploadIntentIds, [nextUploadIntentId]: false },
-  };
-};
 const updatableKeys = [
   "value",
   "currentUploadIntentNumber",
@@ -33,47 +13,6 @@ const updatableKeys = [
 ] as const;
 
 let testEnv: RulesTestEnvironment;
-const balanceDocSchema = z.object({
-  id: z.string(),
-  uid: z.string(),
-  value: z.number(),
-  currentUploadIntentNumber: z.number(),
-  uploadIntentIds: z.record(z.string(), z.boolean()),
-  createdAt: timestampSchema,
-  updatedAt: timestampSchema,
-});
-type TBalanceDoc = z.infer<typeof balanceDocSchema>;
-const balanceDoc1 = {
-  id: "uid123",
-  uid: "uid123",
-  value: 0,
-  currentUploadIntentNumber: 0,
-  uploadIntentIds: {},
-  createdAt: Timestamp.now(),
-  updatedAt: Timestamp.now(),
-} as const satisfies TBalanceDoc;
-const balanceDoc2 = {
-  id: "uid124",
-  uid: "uid124",
-  value: 1000,
-  currentUploadIntentNumber: 1,
-  uploadIntentIds: { uid124_1: true },
-  createdAt: Timestamp.now(),
-  updatedAt: Timestamp.now(),
-} as const satisfies TBalanceDoc;
-const balanceDoc3 = {
-  id: "uid125",
-  uid: "uid125",
-  value: 200,
-  currentUploadIntentNumber: 1,
-  uploadIntentIds: { uid125_1: true },
-  createdAt: Timestamp.now(),
-  updatedAt: Timestamp.now(),
-} as const satisfies TBalanceDoc;
-
-const collectionNames = {
-  balanceDocs: "balanceDocs",
-};
 
 describe("balanceDocTests", () => {
   beforeAll(async () => {
@@ -290,7 +229,7 @@ describe("balanceDocTests", () => {
 
     const updatedDoc = updatifyDoc(incrementBalanceDoc(balanceDoc2));
     const createDocKeys = Object.keys(updatedDoc) as (keyof TBalanceDoc)[];
-    const missingKeyDocs = createDocKeys.map((key) => removeKey(key, updatedDoc));
+    const missingKeyDocs = createDocKeys.map((key) => fsUtils.removeKey(key, updatedDoc));
 
     const promises = missingKeyDocs.map((x) => fsUtils.isRequestDenied(setDoc(docRef, x)));
     const results = await Promise.all(promises);
@@ -469,7 +408,7 @@ describe("balanceDocTests", () => {
 
     const successDoc = updatifyDoc({ ...incrementBalanceDoc(balanceDoc2) });
 
-    const missingKeyDocs = updatableKeys.map((key) => removeKey(key, successDoc));
+    const missingKeyDocs = updatableKeys.map((key) => fsUtils.removeKey(key, successDoc));
     const promises = missingKeyDocs.map((x) => fsUtils.isRequestDenied(setDoc(docRef, x)));
     const results = await Promise.all(promises);
 
