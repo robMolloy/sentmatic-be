@@ -11,6 +11,14 @@ const balanceDocSchema = z.object({
   updatedAt: timestampSchema,
 });
 export type TBalanceDoc = z.infer<typeof balanceDocSchema>;
+
+export const updatableKeys = [
+  "value",
+  "currentUploadIntentNumber",
+  "uploadIntentIds",
+  "updatedAt",
+] as const;
+
 export const incrementBalanceDoc = (p: TBalanceDoc) => {
   const nextUploadIntentNumber = p.currentUploadIntentNumber + 1;
   const nextUploadIntentId = `${p.uid}_${nextUploadIntentNumber}`;
