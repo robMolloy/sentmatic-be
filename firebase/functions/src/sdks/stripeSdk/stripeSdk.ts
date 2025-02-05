@@ -2,7 +2,7 @@ import { Stripe } from "stripe";
 import z from "zod";
 import { fail, TSuccessOrFail } from "../../utils/devUtils";
 
-const paymentIntentSchema = z.object({
+export const paymentIntentSchema = z.object({
   id: z.string(),
   amount: z.number(),
   currency: z.literal("gbp"),

@@ -1,11 +1,10 @@
 import { onCall } from "firebase-functions/v2/https";
 import { fail } from "../utils/devUtils";
 
-import z from "zod";
 import { stripe } from "../config/stripeInitialisation";
-import { stripeSdk } from "../sdks/stripeSdk/stripeSdk";
+import { paymentIntentSchema, stripeSdk } from "../sdks/stripeSdk/stripeSdk";
 
-const requestDataSchema = z.object({ amount: z.number() });
+const requestDataSchema = paymentIntentSchema.pick({ amount: true });
 
 export const createStripePaymentIntentRoute = onCall(async (request) => {
   const parseResponse = requestDataSchema.safeParse(request.data);
