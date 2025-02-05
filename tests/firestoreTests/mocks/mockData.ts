@@ -13,11 +13,11 @@ const uploadIntentDocSchema = z.object({
   createdAt: timestampSchema,
   updatedAt: timestampSchema,
 });
-type TUploadIntentDoc = z.infer<typeof uploadIntentDocSchema>;
+export type TUploadIntentDoc = z.infer<typeof uploadIntentDocSchema>;
 
 export const uploadIntentDoc1 = {
-  id: "uid123_1",
-  uid: "uid123",
+  id: "uid124_1",
+  uid: "uid124",
   createdAt: Timestamp.now(),
   updatedAt: Timestamp.now(),
 } as const satisfies TUploadIntentDoc;

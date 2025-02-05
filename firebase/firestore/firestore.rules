@@ -25,9 +25,9 @@ service cloud.firestore {
       allow create, update, get, list, delete: if false;
     }
 
-    // function getBalanceDoc(id){
-    //   return get(/databases/$(database)/documents/balances/$(id)).data;
-    // }
+    function getBalanceDoc(id){
+      return get(/databases/$(database)/documents/balanceDocs/$(id)).data;
+    }
 
     // function getFileDoc(id){
     //   return get(/databases/$(database)/documents/files/$(id)).data;
@@ -37,6 +37,10 @@ service cloud.firestore {
       function getBalanceDocKeys(){
         return ['id','uid','value','currentUploadIntentNumber','uploadIntentIds','createdAt','updatedAt'];
       }
+      function getUpdatableBalanceDocKeys(){
+        return ['value','currentUploadIntentNumber','uploadIntentIds','updatedAt'];
+      }
+
       function checkBalanceDocDataTypes(){
         let incoming = getIncomingData();
         let keys = getBalanceDocKeys();
@@ -73,7 +77,7 @@ service cloud.firestore {
         let uploadIntentIdsDiff = existing.uploadIntentIds.diff(incoming.uploadIntentIds);
         let auth = getIncomingAuth();
         let currentUploadIntentId = auth.uid + '_' + string(incoming.currentUploadIntentNumber);
-        let updatableKeys = ['value','currentUploadIntentNumber','uploadIntentIds','updatedAt'];
+        let updatableKeys = getUpdatableBalanceDocKeys();
 
         // BL.U.0.A
         return checkBalanceDocDataTypes() // BL.CDT.U
@@ -111,23 +115,24 @@ service cloud.firestore {
         let incoming = getIncomingData();
         let keys = getUploadIntentDocKeys();
 
-        return incoming.keys().hasAll(keys)
-          && incoming.keys().hasOnly(keys)
-          && incoming.id == getIncomingId()
-          && incoming.uid == getIncomingAuth().uid
-          && incoming.createdAt is timestamp
-          && incoming.updatedAt is timestamp
+        return incoming.keys().hasAll(keys) // UI.CDT.1.D
+          && incoming.keys().hasOnly(keys) // UI.CDT.2.D
+          && incoming.id == getIncomingId() // UI.CDT.3.D
+          && incoming.uid == getIncomingAuth().uid // UI.CDT.4.D
+          && incoming.createdAt is timestamp // UI.CDT.5.D
+          && incoming.updatedAt is timestamp // UI.CDT.6.D
       }
       function canCreateUploadIntentDoc() {
+        let id = getIncomingId();
+        let balanceDoc = getBalanceDoc(getIncomingAuth().uid); 
+
         // UI.C.0.A
-        return checkUploadIntentDocDataTypes() // UI.C.1.D
+        return checkUploadIntentDocDataTypes() // UI.CDT.C.1-6
+          && id in balanceDoc.uploadIntentIds // UI.C.1.D
       }
-      // allow create: if false;
       allow create: if canCreateUploadIntentDoc();
       allow update: if false;
-      // allow update: if canUpdateUploadIntentDoc();
       allow get: if false;
-      // allow get: if canGetUploadIntentDoc();
       allow list: if false;
       allow delete: if false;
     }
