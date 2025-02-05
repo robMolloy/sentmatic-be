@@ -1,7 +1,7 @@
 import { fbTestUtils } from "@/utils/firebaseTestUtils";
 import { RulesTestEnvironment } from "@firebase/rules-unit-testing";
 
-import { collectionNames, uploadIntentDoc1 } from "@/mocks/mockData";
+import { uploadIntentDoc1 } from "@/mocks/mockData";
 import { doc, setDoc } from "firebase/firestore";
 import { ref, uploadBytes } from "firebase/storage";
 
@@ -9,6 +9,7 @@ import { convertArrayBufferToBlob } from "@/utils/dataTypeUtils";
 import { isRequestGranted } from "@/utils/firebaseTestUtils/firebaseTestUtils";
 import { readFileSync } from "fs";
 import path from "path";
+import { firestoreCollectionNames } from "@/mocks/metadata";
 
 let testEnv: RulesTestEnvironment;
 
@@ -28,7 +29,7 @@ describe("uploadTests", () => {
   it(`expect true to be true`, async () => {
     await testEnv.withSecurityRulesDisabled(async (context) => {
       const db = context.firestore();
-      const docRef = doc(db, collectionNames.uploadIntentDocs, uploadIntentDoc1.id);
+      const docRef = doc(db, firestoreCollectionNames.uploadIntentDocs, uploadIntentDoc1.id);
       await setDoc(docRef, uploadIntentDoc1);
     });
 

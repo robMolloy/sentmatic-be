@@ -2,7 +2,8 @@ import { fbTestUtils, fsTestUtils } from "@/utils/firebaseTestUtils";
 import { creatifyDoc } from "@/utils/firestoreUtils";
 import { RulesTestEnvironment } from "@firebase/rules-unit-testing";
 import { doc, setDoc } from "firebase/firestore";
-import { balanceDoc2, collectionNames, TUploadIntentDoc, uploadIntentDoc1 } from "@/mocks/mockData";
+import { balanceDoc2, TUploadIntentDoc, uploadIntentDoc1 } from "@/mocks/mockData";
+import { firestoreCollectionNames } from "@/mocks/metadata";
 
 let testEnv: RulesTestEnvironment;
 
@@ -18,26 +19,26 @@ describe("balanceDocTests", () => {
     await testEnv.cleanup();
   });
 
-  it(`UI.C.0.A - approve create access if valid (${collectionNames.uploadIntentDocs})`, async () => {
+  it(`UI.C.0.A - approve create access if valid (${firestoreCollectionNames.uploadIntentDocs})`, async () => {
     await testEnv.withSecurityRulesDisabled(async (context) => {
-      const docRef = doc(context.firestore(), collectionNames.balanceDocs, balanceDoc2.id);
+      const docRef = doc(context.firestore(), firestoreCollectionNames.balanceDocs, balanceDoc2.id);
       await setDoc(docRef, balanceDoc2);
     });
     const authedDb = testEnv.authenticatedContext(uploadIntentDoc1.uid).firestore();
-    const docRef = doc(authedDb, collectionNames.uploadIntentDocs, uploadIntentDoc1.id);
+    const docRef = doc(authedDb, firestoreCollectionNames.uploadIntentDocs, uploadIntentDoc1.id);
 
     const successDoc = creatifyDoc(uploadIntentDoc1);
     const result = await fbTestUtils.isRequestGranted(setDoc(docRef, successDoc));
 
     expect(result.permissionGranted).toBe(true);
   });
-  it(`UI.CDT.1.D.C - deny create access if "incoming.keys().hasAll(keys)" is not met (${collectionNames.uploadIntentDocs})`, async () => {
+  it(`UI.CDT.1.D.C - deny create access if "incoming.keys().hasAll(keys)" is not met (${firestoreCollectionNames.uploadIntentDocs})`, async () => {
     await testEnv.withSecurityRulesDisabled(async (context) => {
-      const docRef = doc(context.firestore(), collectionNames.balanceDocs, balanceDoc2.id);
+      const docRef = doc(context.firestore(), firestoreCollectionNames.balanceDocs, balanceDoc2.id);
       await setDoc(docRef, balanceDoc2);
     });
     const authedDb = testEnv.authenticatedContext(uploadIntentDoc1.uid).firestore();
-    const docRef = doc(authedDb, collectionNames.uploadIntentDocs, uploadIntentDoc1.id);
+    const docRef = doc(authedDb, firestoreCollectionNames.uploadIntentDocs, uploadIntentDoc1.id);
 
     const successDoc = creatifyDoc(uploadIntentDoc1);
     const createDocKeys = Object.keys(uploadIntentDoc1) as (keyof TUploadIntentDoc)[];
@@ -48,13 +49,13 @@ describe("balanceDocTests", () => {
     const isAllDenied = results.every((x) => x.permissionDenied);
     expect(isAllDenied).toBe(true);
   });
-  it(`UI.CDT.2.D.C - deny create access if "incoming.keys().hasOnly(keys)" is not met (${collectionNames.uploadIntentDocs})`, async () => {
+  it(`UI.CDT.2.D.C - deny create access if "incoming.keys().hasOnly(keys)" is not met (${firestoreCollectionNames.uploadIntentDocs})`, async () => {
     await testEnv.withSecurityRulesDisabled(async (context) => {
-      const docRef = doc(context.firestore(), collectionNames.balanceDocs, balanceDoc2.id);
+      const docRef = doc(context.firestore(), firestoreCollectionNames.balanceDocs, balanceDoc2.id);
       await setDoc(docRef, balanceDoc2);
     });
     const authedDb = testEnv.authenticatedContext(uploadIntentDoc1.uid).firestore();
-    const docRef = doc(authedDb, collectionNames.uploadIntentDocs, uploadIntentDoc1.id);
+    const docRef = doc(authedDb, firestoreCollectionNames.uploadIntentDocs, uploadIntentDoc1.id);
 
     const successDoc = creatifyDoc(uploadIntentDoc1);
     const newDoc = { ...successDoc, addKey: "" };
@@ -62,13 +63,13 @@ describe("balanceDocTests", () => {
     const result = await fbTestUtils.isRequestDenied(setDoc(docRef, newDoc));
     expect(result.permissionDenied).toBe(true);
   });
-  it(`UI.CDT.3.D.C - deny create access if "incoming.id == getIncomingId()" is not met (${collectionNames.uploadIntentDocs})`, async () => {
+  it(`UI.CDT.3.D.C - deny create access if "incoming.id == getIncomingId()" is not met (${firestoreCollectionNames.uploadIntentDocs})`, async () => {
     await testEnv.withSecurityRulesDisabled(async (context) => {
-      const docRef = doc(context.firestore(), collectionNames.balanceDocs, balanceDoc2.id);
+      const docRef = doc(context.firestore(), firestoreCollectionNames.balanceDocs, balanceDoc2.id);
       await setDoc(docRef, balanceDoc2);
     });
     const authedDb = testEnv.authenticatedContext(uploadIntentDoc1.uid).firestore();
-    const docRef = doc(authedDb, collectionNames.uploadIntentDocs, uploadIntentDoc1.id);
+    const docRef = doc(authedDb, firestoreCollectionNames.uploadIntentDocs, uploadIntentDoc1.id);
 
     const successDoc = creatifyDoc(uploadIntentDoc1);
     const newDoc = { ...successDoc, id: `${successDoc.id}_` };
@@ -76,13 +77,13 @@ describe("balanceDocTests", () => {
     const result = await fbTestUtils.isRequestDenied(setDoc(docRef, newDoc));
     expect(result.permissionDenied).toBe(true);
   });
-  it(`UI.CDT.4.D.C - deny create access if "incoming.uid == getIncomingAuth().uid" is not met (${collectionNames.uploadIntentDocs})`, async () => {
+  it(`UI.CDT.4.D.C - deny create access if "incoming.uid == getIncomingAuth().uid" is not met (${firestoreCollectionNames.uploadIntentDocs})`, async () => {
     await testEnv.withSecurityRulesDisabled(async (context) => {
-      const docRef = doc(context.firestore(), collectionNames.balanceDocs, balanceDoc2.id);
+      const docRef = doc(context.firestore(), firestoreCollectionNames.balanceDocs, balanceDoc2.id);
       await setDoc(docRef, balanceDoc2);
     });
     const authedDb = testEnv.authenticatedContext(uploadIntentDoc1.uid).firestore();
-    const docRef = doc(authedDb, collectionNames.uploadIntentDocs, uploadIntentDoc1.id);
+    const docRef = doc(authedDb, firestoreCollectionNames.uploadIntentDocs, uploadIntentDoc1.id);
 
     const successDoc = creatifyDoc(uploadIntentDoc1);
     const newDoc = { ...successDoc, uid: `${successDoc.uid}_` };
@@ -90,14 +91,14 @@ describe("balanceDocTests", () => {
     const result = await fbTestUtils.isRequestDenied(setDoc(docRef, newDoc));
     expect(result.permissionDenied).toBe(true);
   });
-  it(`UI.CDT.5.D.C - deny create access if "incoming.createdAt is timestamp" is not met (${collectionNames.uploadIntentDocs})`, async () => {
+  it(`UI.CDT.5.D.C - deny create access if "incoming.createdAt is timestamp" is not met (${firestoreCollectionNames.uploadIntentDocs})`, async () => {
     await testEnv.withSecurityRulesDisabled(async (context) => {
       const fs = context.firestore();
-      const docRef = doc(fs, collectionNames.balanceDocs, balanceDoc2.id);
+      const docRef = doc(fs, firestoreCollectionNames.balanceDocs, balanceDoc2.id);
       await setDoc(docRef, balanceDoc2);
     });
     const authedDb = testEnv.authenticatedContext(uploadIntentDoc1.uid).firestore();
-    const docRef = doc(authedDb, collectionNames.uploadIntentDocs, uploadIntentDoc1.id);
+    const docRef = doc(authedDb, firestoreCollectionNames.uploadIntentDocs, uploadIntentDoc1.id);
 
     const successDoc = creatifyDoc(uploadIntentDoc1);
     const { seconds, nanoseconds } = uploadIntentDoc1.createdAt;
@@ -106,14 +107,14 @@ describe("balanceDocTests", () => {
     const result = await fbTestUtils.isRequestDenied(setDoc(docRef, newDoc));
     expect(result.permissionDenied).toBe(true);
   });
-  it(`UI.CDT.6.D.C - deny create access if "incoming.updatedAt is timestamp" is not met (${collectionNames.uploadIntentDocs})`, async () => {
+  it(`UI.CDT.6.D.C - deny create access if "incoming.updatedAt is timestamp" is not met (${firestoreCollectionNames.uploadIntentDocs})`, async () => {
     await testEnv.withSecurityRulesDisabled(async (context) => {
       const fs = context.firestore();
-      const docRef = doc(fs, collectionNames.balanceDocs, balanceDoc2.id);
+      const docRef = doc(fs, firestoreCollectionNames.balanceDocs, balanceDoc2.id);
       await setDoc(docRef, balanceDoc2);
     });
     const authedDb = testEnv.authenticatedContext(uploadIntentDoc1.uid).firestore();
-    const docRef = doc(authedDb, collectionNames.uploadIntentDocs, uploadIntentDoc1.id);
+    const docRef = doc(authedDb, firestoreCollectionNames.uploadIntentDocs, uploadIntentDoc1.id);
 
     const successDoc = creatifyDoc(uploadIntentDoc1);
     const { seconds, nanoseconds } = uploadIntentDoc1.updatedAt;
@@ -122,15 +123,15 @@ describe("balanceDocTests", () => {
     const result = await fbTestUtils.isRequestDenied(setDoc(docRef, newDoc));
     expect(result.permissionDenied).toBe(true);
   });
-  it(`UI.C.1.D - deny create access if "id in balanceDoc.uploadIntentIds" is not met (${collectionNames.uploadIntentDocs})`, async () => {
+  it(`UI.C.1.D - deny create access if "id in balanceDoc.uploadIntentIds" is not met (${firestoreCollectionNames.uploadIntentDocs})`, async () => {
     await testEnv.withSecurityRulesDisabled(async (context) => {
-      const docRef = doc(context.firestore(), collectionNames.balanceDocs, balanceDoc2.id);
+      const docRef = doc(context.firestore(), firestoreCollectionNames.balanceDocs, balanceDoc2.id);
       await setDoc(docRef, { ...balanceDoc2, uploadIntentIds: {} });
     });
     const authedDb = testEnv.authenticatedContext(uploadIntentDoc1.uid).firestore();
 
     const newDoc = creatifyDoc(uploadIntentDoc1);
-    const docRef = doc(authedDb, collectionNames.uploadIntentDocs, uploadIntentDoc1.id);
+    const docRef = doc(authedDb, firestoreCollectionNames.uploadIntentDocs, uploadIntentDoc1.id);
 
     const result = await fbTestUtils.isRequestDenied(setDoc(docRef, newDoc));
     expect(result.permissionDenied).toBe(true);

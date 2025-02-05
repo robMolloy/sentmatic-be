@@ -2,11 +2,6 @@ import { timestampSchema } from "@/utils/firestoreUtils";
 import { Timestamp } from "firebase/firestore";
 import { z } from "zod";
 
-export const collectionNames = {
-  balanceDocs: "balanceDocs",
-  uploadIntentDocs: "uploadIntentDocs",
-};
-
 const uploadIntentDocSchema = z.object({
   id: z.string(),
   uid: z.string(),
