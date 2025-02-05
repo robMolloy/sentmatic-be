@@ -2,7 +2,7 @@ import { fbTestUtils, fsTestUtils } from "@/utils/firebaseTestUtils";
 import { creatifyDoc } from "@/utils/firestoreUtils";
 import { RulesTestEnvironment } from "@firebase/rules-unit-testing";
 import { doc, setDoc } from "firebase/firestore";
-import { balanceDoc2, collectionNames, TUploadIntentDoc, uploadIntentDoc1 } from "./mocks/mockData";
+import { balanceDoc2, collectionNames, TUploadIntentDoc, uploadIntentDoc1 } from "@/mocks/mockData";
 
 let testEnv: RulesTestEnvironment;
 

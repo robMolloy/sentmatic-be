@@ -2,7 +2,7 @@ import { fbTestUtils, fsTestUtils } from "@/utils/firebaseTestUtils";
 import { creatifyDoc, getNotNowTimestamp, updatifyDoc } from "@/utils/firestoreUtils";
 import { RulesTestEnvironment } from "@firebase/rules-unit-testing";
 import { doc, getDoc, setDoc } from "firebase/firestore";
-import { balanceDoc1, balanceDoc2, balanceDoc3, collectionNames } from "./mocks/mockData";
+import { balanceDoc1, balanceDoc2, balanceDoc3, collectionNames } from "@/mocks/mockData";
 import {
   incrementBalanceDoc,
   TBalanceDoc,
