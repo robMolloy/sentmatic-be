@@ -9,6 +9,7 @@ export const paymentIntentSchema = z.object({
   status: z.string(),
   client_secret: z.string(),
 });
+export type TPaymentIntent = z.infer<typeof paymentIntentSchema>;
 
 const retrievePaymentIntent = async (p: {
   stripe: Stripe;

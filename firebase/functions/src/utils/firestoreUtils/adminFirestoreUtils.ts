@@ -1,30 +1,27 @@
-import adminSdk from "firebase-admin";
+import { Timestamp as adminTimestamp } from "firebase-admin/firestore";
+import z from "zod";
 
-//
-export const removeKey = <T extends object, K extends keyof T>(key: K, object: T): Omit<T, K> => {
-  const { [key]: _, ...rest } = object;
-  return rest;
+type TTimestamp = ReturnType<typeof adminTimestamp.now>;
+type TTimestampValue = Pick<TTimestamp, "seconds" | "nanoseconds">;
+
+const getAdminTimestampFromTimestampValue = (x: TTimestampValue) => {
+  return new adminTimestamp(x.seconds, x.nanoseconds);
 };
 
-const adminServerTimestamp = adminSdk.firestore.FieldValue.serverTimestamp;
-export type TAdminServerTimestamp = ReturnType<typeof adminServerTimestamp>;
+export const adminTimestampSchema = z
+  .object({ seconds: z.number(), nanoseconds: z.number() })
+  .transform((x) => getAdminTimestampFromTimestampValue(x));
 
-const adminTimestamp = adminSdk.firestore.Timestamp;
-export type TAdminTimestamp = ReturnType<typeof adminTimestamp.now>;
+export const adminServerTimestamp = adminTimestamp.now;
 
 export const adminCreatifyDoc = <T extends object>(obj: T) => {
+  return { ...obj, createdAt: adminServerTimestamp(), updatedAt: adminServerTimestamp() };
+};
+
+export const adminUpdatifyDoc = <T extends { createdAt: TTimestampValue }>(object: T) => {
   return {
-    ...obj,
-    createdAt: adminSdk.firestore.FieldValue.serverTimestamp(),
-    updatedAt: adminSdk.firestore.FieldValue.serverTimestamp(),
+    ...object,
+    createdAt: getAdminTimestampFromTimestampValue(object.createdAt),
+    updatedAt: adminServerTimestamp(),
   };
-};
-
-export const adminUpdatifyDoc = <T extends object>(object: T) => {
-  return { ...object, updatedAt: adminSdk.firestore.FieldValue.serverTimestamp() };
-};
-
-export const getNotNowTimestamp = () => {
-  const now = adminTimestamp.now();
-  return { ...now, nanoseconds: now.nanoseconds - 1 };
 };
