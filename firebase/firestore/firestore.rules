@@ -136,89 +136,37 @@ service cloud.firestore {
       allow list: if false;
       allow delete: if false;
     }
-    // match /files/{id} {
-    //   function getFileKeys(){
-    //     return ['id', 'uid', 'fileName', 'encryptedFileName', 'serializedEncryptionKeySalt', 'serializedInitializationVector', 'createdAt', 'updatedAt'];
-    //   }
-    //   function checkFileDataTypes(){
-    //     let incoming = getIncomingData();
-    //     let keys = getFileKeys();
-
-    //     return incoming.keys().hasAll(keys)
-    //       && incoming.keys().hasOnly(keys)
-    //       && incoming.id == getIncomingId()
-    //       && incoming.uid == getIncomingAuth().uid
-    //       && incoming.fileName is string
-    //       && incoming.encryptedFileName is string
-    //       && incoming.serializedEncryptionKeySalt is string
-    //       && incoming.serializedInitializationVector is string
-    //       && incoming.createdAt is timestamp
-    //       && incoming.updatedAt is timestamp
-    //   }
-    //   function canCreateFile(){
-    //     let incoming = getIncomingData();
-    //     let auth = getIncomingAuth();
-    //     let balance = getBalanceDoc(auth.uid);
-    //     let id = auth.uid + '_' + string(balance.couponStream) + '_' + string(balance.numberOfCoupons);
-
-    //     return checkFileDataTypes()
-    //       && incoming.id == id
-    //       && isNow(incoming.createdAt)
-    //       && isNow(incoming.updatedAt)
-    //       && balance.numberOfCoupons > 0
-    //   }
-    //   function canGetFile(){
-    //     let auth = getIncomingAuth();
-    //     let existing = getExistingData();
-
-    //     return existing.uid == auth.uid
-    //   }
-
-    //   function canListFiles(){
-    //     let auth = getIncomingAuth();
-    //     let params = getParams();
-
-    //     return params.uid == auth.uid
-    //   }
-      
-    //   allow create: if canCreateFile();
-    //   allow get: if canGetFile();
-    //   allow list: if canListFiles();
-    //   allow update: if false;
-    //   allow delete: if false;
-    // }
     
-    // match /paymentIntents/{id} {
-    //   function getPaymentIntentKeys(){
-    //     return ['id', 'uid', 'createdAt', 'updatedAt'];
-    //   }
-    //   function checkPaymentIntentDataTypes(){
-    //     let incoming = getIncomingData();
-    //     let keys = getPaymentIntentKeys();
+    match /paymentIntentDocs/{id} {
+      function getPaymentIntentKeys(){
+        return ['id', 'uid', 'isAccountDebitted', 'createdAt', 'updatedAt'];
+      }
+      function checkIncomingPaymentIntentDocData(){
+        let incoming = getIncomingData();
+        let keys = getPaymentIntentKeys();
 
-    //     return incoming.keys().hasAll(keys)
-    //       && incoming.keys().hasOnly(keys)
-    //       && incoming.id == getIncomingId()
-    //       && incoming.createdAt is timestamp
-    //       && incoming.updatedAt is timestamp
-    //   }
-    //   function canCreatePaymentIntent(){
-    //     let incoming = getIncomingData();
-    //     let incomingId = getIncomingId();
-    //     let auth = getIncomingAuth();
+        return incoming.keys().hasAll(keys) // PI.CDT.1.D
+          && incoming.keys().hasOnly(keys) // PI.CDT.2.D
+          && incoming.id == getIncomingId() // PI.CDT.3.D
+          && incoming.uid == getIncomingAuth().uid // PI.CDT.4.D
+          && incoming.isAccountDebitted is bool // PI.CDT.5.D
+          && incoming.createdAt is timestamp // PI.CDT.6.D
+          && incoming.updatedAt is timestamp // PI.CDT.7.D
+      }
+      function canCreatePaymentIntent(){
+        let incoming = getIncomingData();
         
-    //     return checkPaymentIntentDataTypes()
-    //       && incoming.id == incomingId
-    //       && incoming.uid == auth.uid
-    //       && isNow(incoming.createdAt)
-    //       && isNow(incoming.updatedAt)
-    //   }
+        return checkIncomingPaymentIntentDocData() // PI.CDT.C.1-7
+          && incoming.isAccountDebitted == false // PI.C.1.D
+          && isNow(incoming.createdAt) // PI.C.2.D
+          && isNow(incoming.updatedAt) // PI.C.3.D
+      }
 
-    //   allow create: if canCreatePaymentIntent();
-    //   allow get: if false;
-    //   allow list: if false;
-    //   allow update: if false;
-    //   allow delete: if false;
-    // }
+      allow create: if canCreatePaymentIntent();
+      allow get: if false;
+      allow list: if false;
+      allow update: if false;
+      allow delete: if false;
+    }
   }
 }

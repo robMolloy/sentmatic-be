@@ -1,6 +1,15 @@
 import { TBalanceDoc } from "@/firestoreSdks/balanceDocFirestoreSdk";
+import { TPaymentIntentDoc } from "@/firestoreSdks/paymentIntentDocFirestoreSdk";
 import { TUploadIntentDoc } from "@/firestoreSdks/uploadIntentDocFirestoreSdk";
 import { Timestamp } from "firebase/firestore";
+
+export const paymentIntentDoc1 = {
+  id: "pi_id_123",
+  uid: "id_123",
+  isAccountDebitted: false,
+  createdAt: Timestamp.now(),
+  updatedAt: Timestamp.now(),
+} as const satisfies TPaymentIntentDoc;
 
 export const uploadIntentDoc1 = {
   id: "uid124_1",
