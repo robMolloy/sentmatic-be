@@ -8,7 +8,7 @@ import { TUploadIntentDoc } from "@/firestoreSdks/uploadIntentDocFirestoreSdk";
 
 let testEnv: RulesTestEnvironment;
 
-describe("balanceDocTests", () => {
+describe("uploadIntentDocTests", () => {
   beforeAll(async () => {
     fbTestUtils.setDefaultLogLevel();
     testEnv = await fbTestUtils.createTestEnvironment({ projectId: "demo-project" });
