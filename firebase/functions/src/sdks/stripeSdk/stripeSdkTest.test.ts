@@ -18,6 +18,6 @@ describe("createTestDocRouteTests", () => {
     if (!retrieveResponse.success) return;
 
     expect(retrieveResponse.data.amount).toBe(100);
-    expect(retrieveResponse.data.currency).toBe("gbp");
+    expect(retrieveResponse.data.currency).toBe("usd");
   });
 });

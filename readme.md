@@ -14,7 +14,7 @@
     - if paymentIntentDoc.accountDebitted == true break
   - get paymentIntent
     - if paymentIntent.status != success break
-    - if paymentIntent.currency != gbp break
+    - if paymentIntent.currency != usd break
     - if paymentIntent.amount <= 0 break
   - update balanceDoc by paymentIntent.amount
   - update paymentIntentDoc.accountDebitted == true

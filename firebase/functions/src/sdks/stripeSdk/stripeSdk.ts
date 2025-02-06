@@ -5,7 +5,7 @@ import { fail, TSuccessOrFail } from "../../utils/devUtils";
 export const paymentIntentSchema = z.object({
   id: z.string(),
   amount: z.number(),
-  currency: z.literal("gbp"),
+  currency: z.literal("usd"),
   status: z.string(),
   client_secret: z.string(),
 });
@@ -31,8 +31,25 @@ const createPaymentIntent = async (p: {
   try {
     const paymentIntent = await p.stripe.paymentIntents.create({
       amount: p.amount,
-      currency: "gbp",
+      currency: "usd",
     });
+
+    return paymentIntentSchema.safeParse(paymentIntent);
+  } catch (e) {
+    const error = e as { message: string };
+    return fail({ error });
+  }
+};
+export const fulfillPaymentIntent = async (p: {
+  stripe: Stripe;
+  paymentIntentId: string;
+  // data:
+}): Promise<TSuccessOrFail<z.infer<typeof paymentIntentSchema>>> => {
+  try {
+    const paymentIntent = await p.stripe.paymentIntents.update(p.paymentIntentId, {
+      payment_method: "",
+    });
+    console.log(`stripeSdk.ts:${/*LL*/ 62}`, { paymentIntent });
 
     return paymentIntentSchema.safeParse(paymentIntent);
   } catch (e) {

@@ -84,19 +84,24 @@ const getPaymentIntentDoc = async (p: { admin: typeof adminSdk; id: string }) =>
   }
 };
 
-// const setPaymentIntentDoc = async (p: { admin: typeof adminSdk; data: TPaymentIntentDoc }) => {
-//   try {
-//     await p.admin
-//       .firestore()
-//       .collection(firestoreCollectionNames.paymenIntentDocs)
-//       .doc(p.data.id)
-//       .set(p.data);
+const setPaymentIntentDoc = async (p: { admin: typeof adminSdk; data: TPaymentIntentDoc }) => {
+  try {
+    await p.admin
+      .firestore()
+      .collection(firestoreCollectionNames.paymentIntentDocs)
+      .doc(p.data.id)
+      .set(p.data);
 
-//     return getBalanceDoc({ admin: p.admin, id: p.data.id });
-//   } catch (e) {
-//     const error = e as { message: string };
-//     return fail({ error });
-//   }
-// };
+    return { success: true } as const;
+  } catch (e) {
+    const error = e as { message: string };
+    return fail({ error });
+  }
+};
 
-export const adminFirestoreSdk = { getBalanceDoc, setBalanceDoc, getPaymentIntentDoc };
+export const adminFirestoreSdk = {
+  getBalanceDoc,
+  setBalanceDoc,
+  getPaymentIntentDoc,
+  setPaymentIntentDoc,
+};

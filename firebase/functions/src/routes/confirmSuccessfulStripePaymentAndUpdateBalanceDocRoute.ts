@@ -1,7 +1,6 @@
 import { onCall } from "firebase-functions/v2/https";
 import { fail } from "../utils/devUtils";
 
-import { Timestamp } from "firebase-admin/firestore";
 import z from "zod";
 import { adminFirestoreSdk } from "../adminFirestoreSdk/adminFirestoreSdk";
 import { adminUpdatifyDoc } from "../adminFirestoreSdk/adminFirestoreUtils";
@@ -36,28 +35,24 @@ export const confirmSuccessfulStripePaymentAndUpdateBalanceDocRoute = onCall(asy
   const paymentIntentDoc = paymentIntentDocResponse.data;
   if (paymentIntentDoc.uid != request.auth.uid)
     return fail({ error: { message: "user id does not match the paymentIntentDoc" } });
-  if (paymentIntent.currency != "gbp")
-    return fail({ error: { message: "currency must be 'gbp'" } });
+  if (paymentIntent.currency != "usd")
+    return fail({ error: { message: "currency must be 'usd'" } });
   if (paymentIntent.amount <= 0)
     return fail({ error: { message: "amount must be greater than 0" } });
+  if (paymentIntentDoc.isAccountDebitted)
+    return fail({ error: { message: "amount already debitted" } });
 
-  const balanceDocResponse = await adminFirestoreSdk.getBalanceDoc({
+  const getBalanceDocResponse = await adminFirestoreSdk.getBalanceDoc({
     admin,
     id: request.auth.uid,
   });
-  if (!balanceDocResponse.success) return fail({ error: { message: "Could not get balanceDoc" } });
+  if (!getBalanceDocResponse.success)
+    return fail({ error: { message: "Could not get balanceDoc" } });
 
-  const newBalanceDoc1 = adminUpdatifyDoc({
-    ...balanceDocResponse.data,
-    value: balanceDocResponse.data.value + paymentIntent.amount,
+  const newBalanceDoc = adminUpdatifyDoc({
+    ...getBalanceDocResponse.data,
+    value: getBalanceDocResponse.data.value + paymentIntent.amount,
   });
-  const newBalanceDoc2 = {
-    ...balanceDocResponse.data,
-    value: balanceDocResponse.data.value + paymentIntent.amount,
-    createdAt: Timestamp.now(),
-    updatedAt: Timestamp.now(),
-  };
-  const newBalanceDoc = false ? newBalanceDoc1 : newBalanceDoc2;
 
   const setBalanceDocResponse = await adminFirestoreSdk.setBalanceDoc({
     admin,
@@ -66,6 +61,14 @@ export const confirmSuccessfulStripePaymentAndUpdateBalanceDocRoute = onCall(asy
 
   if (!setBalanceDocResponse.success)
     return fail({ error: { message: "Could not set balanceDoc" } });
+
+  const setPaymentIntentDocResponse = await adminFirestoreSdk.setPaymentIntentDoc({
+    admin,
+    data: adminUpdatifyDoc({ ...paymentIntentDoc, isAccountDebitted: true }),
+  });
+
+  if (!setPaymentIntentDocResponse.success)
+    return fail({ error: { message: "Could not set paymentIntentDoc isAccountDebitted:true" } });
 
   return { success: true };
 });
