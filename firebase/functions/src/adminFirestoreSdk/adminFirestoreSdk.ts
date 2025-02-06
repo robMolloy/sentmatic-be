@@ -1,45 +1,64 @@
 import adminSdk from "firebase-admin";
+import { serverTimestamp } from "firebase/firestore";
 import z from "zod";
-import { fail, success } from "../utils/devUtils";
+import { fail } from "../utils/devUtils";
 import { timestampSchema } from "./adminFirestoreUtils";
-import { adminCreatifyDoc } from "../utils/firestoreUtils";
 
-const collectionNames = { testDocs: "testDocs" };
+const firestoreCollectionNames = { balanceDocs: "balanceDocs" };
 
-export const testDocSchema = z.object({
+const balanceDocSchema = z.object({
   id: z.string(),
-  amount: z.number(),
+  uid: z.string(),
+  value: z.number(),
+  currentUploadIntentNumber: z.number(),
+  uploadIntentIds: z.record(z.string(), z.boolean()),
   createdAt: timestampSchema,
   updatedAt: timestampSchema,
 });
-export type TTestDoc = z.infer<typeof testDocSchema>;
+export type TBalanceDoc = z.infer<typeof balanceDocSchema>;
+const balanceDocRequestSchema = z.object({
+  id: z.string(),
+  uid: z.string(),
+  value: z.number(),
+  currentUploadIntentNumber: z.number(),
+  uploadIntentIds: z.record(z.string(), z.boolean()),
+  createdAt: z.custom<ReturnType<typeof serverTimestamp>>((x) => {
+    return serverTimestamp().isEqual(x);
+  }),
+  updatedAt: z.custom<ReturnType<typeof serverTimestamp>>((x) => {
+    return serverTimestamp().isEqual(x);
+  }),
+});
+export type TBalanceDocRequest = z.infer<typeof balanceDocRequestSchema>;
 
-const getTestDoc = async (p: { admin: typeof adminSdk; id: string }) => {
+const getBalanceDoc = async (p: { admin: typeof adminSdk; id: string }) => {
   try {
-    const initDoc = await p.admin.firestore().collection(collectionNames.testDocs).doc(p.id).get();
+    const initDoc = await p.admin
+      .firestore()
+      .collection(firestoreCollectionNames.balanceDocs)
+      .doc(p.id)
+      .get();
 
-    return testDocSchema.safeParse(initDoc.data());
+    return balanceDocSchema.safeParse(initDoc.data());
   } catch (e) {
     const error = e as { message: string };
     return fail({ error });
   }
 };
 
-const createTestDoc = async (p: {
-  admin: typeof adminSdk;
-  data: Pick<TTestDoc, "id" | "amount">;
-}) => {
+const setBalanceDoc = async (p: { admin: typeof adminSdk; data: TBalanceDocRequest }) => {
   try {
     await p.admin
       .firestore()
-      .collection(collectionNames.testDocs)
+      .collection(firestoreCollectionNames.balanceDocs)
       .doc(p.data.id)
-      .set(adminCreatifyDoc({ ...p.data }));
-    return success({ data: undefined });
+      .set(p.data);
+
+    return getBalanceDoc({ admin: p.admin, id: p.data.id });
   } catch (e) {
     const error = e as { message: string };
     return fail({ error });
   }
 };
 
-export const adminFirestoreSdk = { createTestDoc, getTestDoc };
+export const adminFirestoreSdk = { getBalanceDoc, setBalanceDoc };

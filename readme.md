@@ -5,14 +5,14 @@
 - user creates a paymentIntent
 - user fulfills paymentIntent
 - user creates a paymentIntentDoc
-  - id of `${uid}_${paymentIntentDocId}`
+  - id of paymentIntentId
   - uid == uid
   - paymentIntentDocId == paymentIntentDocId
   - accountDebitted == false
-- paymentIntentDoc creation causes balanceDoc to be updated by admin
-  - look up paymentIntentDoc
+- user calls confirmSuccessfulStripePaymentAndUpdateBalanceDoc
+  - get paymentIntentDoc
     - if paymentIntentDoc.accountDebitted == true break
-  - look up paymentIntent
+  - get paymentIntent
     - if paymentIntent.status != success break
     - if paymentIntent.currency != gbp break
     - if paymentIntent.amount <= 0 break
