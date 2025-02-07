@@ -8,12 +8,10 @@
     "outDir": "lib",
     "sourceMap": true,
     "strict": true,
-    "target": "es2017",
-    "paths": {
-      "@/*": ["./tests/*"]
-    }
+    "skipLibCheck": true,
+    "target": "es2017"
   },
   "compileOnSave": true,
-  "include": ["tests", "firebase/firestore"],
+  "include": ["."],
   "exclude": ["node_modules"]
 }
