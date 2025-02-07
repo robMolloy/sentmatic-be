@@ -1,12 +1,8 @@
 import adminSdk from "firebase-admin";
 import z from "zod";
 import { fail } from "../utils/devUtils";
+import { firestoreCollectionNames } from "../tests/mocks/metadata";
 import { adminTimestampSchema } from "./adminFirestoreUtils";
-
-export const firestoreCollectionNames = {
-  balanceDocs: "balanceDocs",
-  paymentIntentDocs: "paymentIntentDocs",
-};
 
 const balanceDocSchema = z.object({
   id: z.string(),

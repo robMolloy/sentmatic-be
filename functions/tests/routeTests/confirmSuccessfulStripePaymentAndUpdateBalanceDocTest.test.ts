@@ -1,6 +1,6 @@
 import { doc, getDoc, setDoc } from "@firebase/firestore";
 import { RulesTestEnvironment } from "@firebase/rules-unit-testing";
-import { firestoreCollectionNames } from "../../adminFirestoreSdk/adminFirestoreSdk";
+import { firestoreCollectionNames } from "../mocks/metadata";
 import { firebaseConfig } from "../../config/firebaseConfig";
 import { creatifyDoc } from "../../utils/firestoreUtils/firestoreUtils";
 import { wrappedConfirmSuccessfulStripePaymentAndUpdateBalanceDocRoute } from "./wrappedRoutes";
