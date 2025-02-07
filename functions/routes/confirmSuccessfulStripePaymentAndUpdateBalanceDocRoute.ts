@@ -23,22 +23,29 @@ export const confirmSuccessfulStripePaymentAndUpdateBalanceDocRoute = onCall(asy
     stripe,
     id: paymentIntentId,
   });
-  if (!paymentIntentResponse.success) return paymentIntentResponse;
-  const paymentIntent = paymentIntentResponse.data;
+  if (!paymentIntentResponse.success)
+    return fail({ error: { message: "could not find paymentIntent" } });
 
   const paymentIntentDocResponse = await adminFirestoreSdk.getPaymentIntentDoc({
     admin,
     id: paymentIntentId,
   });
 
-  if (!paymentIntentDocResponse.success) return paymentIntentDocResponse;
+  if (!paymentIntentDocResponse.success)
+    return fail({ error: { message: "could not find paymentIntentDoc" } });
+
+  const paymentIntent = paymentIntentResponse.data;
   const paymentIntentDoc = paymentIntentDocResponse.data;
+
   if (paymentIntentDoc.uid != request.auth.uid)
     return fail({ error: { message: "user id does not match the paymentIntentDoc" } });
+
   if (paymentIntent.currency != "usd")
     return fail({ error: { message: "currency must be 'usd'" } });
+
   if (paymentIntent.amount <= 0)
     return fail({ error: { message: "amount must be greater than 0" } });
+
   if (paymentIntentDoc.isAccountDebitted)
     return fail({ error: { message: "amount already debitted" } });
 
@@ -49,14 +56,12 @@ export const confirmSuccessfulStripePaymentAndUpdateBalanceDocRoute = onCall(asy
   if (!getBalanceDocResponse.success)
     return fail({ error: { message: "Could not get balanceDoc" } });
 
-  const newBalanceDoc = adminUpdatifyDoc({
-    ...getBalanceDocResponse.data,
-    value: getBalanceDocResponse.data.value + paymentIntent.amount,
-  });
-
   const setBalanceDocResponse = await adminFirestoreSdk.setBalanceDoc({
     admin,
-    data: newBalanceDoc,
+    data: adminUpdatifyDoc({
+      ...getBalanceDocResponse.data,
+      value: getBalanceDocResponse.data.value + paymentIntent.amount,
+    }),
   });
 
   if (!setBalanceDocResponse.success)
