@@ -3,17 +3,8 @@ import z from "zod";
 import { fail } from "../utils/devUtils";
 import { firestoreCollectionNames } from "../tests/mocks/metadata";
 import { adminTimestampSchema } from "./adminFirestoreUtils";
+import { balanceDocSchema, TBalanceDoc } from "../tests/firestoreSdks/balanceDocFirestoreSdk";
 
-const balanceDocSchema = z.object({
-  id: z.string(),
-  uid: z.string(),
-  value: z.number(),
-  currentUploadIntentNumber: z.number(),
-  uploadIntentIds: z.record(z.string(), z.boolean()),
-  createdAt: adminTimestampSchema,
-  updatedAt: adminTimestampSchema,
-});
-export type TBalanceDoc = z.infer<typeof balanceDocSchema>;
 const balanceDocRequestSchema = z.object({
   id: z.string(),
   uid: z.string(),

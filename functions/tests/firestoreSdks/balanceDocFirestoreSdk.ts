@@ -1,7 +1,7 @@
 import z from "zod";
 import { timestampSchema } from "../../utils/firestoreUtils/firestoreUtils";
 
-const balanceDocSchema = z.object({
+export const balanceDocSchema = z.object({
   id: z.string(),
   uid: z.string(),
   value: z.number(),
