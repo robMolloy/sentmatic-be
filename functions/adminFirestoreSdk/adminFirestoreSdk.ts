@@ -4,26 +4,23 @@ import { fail } from "../utils/devUtils";
 import { firestoreCollectionNames } from "../tests/mocks/metadata";
 import { adminTimestampSchema } from "./adminFirestoreUtils";
 import { balanceDocSchema, TBalanceDoc } from "../tests/firestoreSdks/balanceDocFirestoreSdk";
+import { paymentIntentDocSchema } from "../tests/firestoreSdks/paymentIntentDocFirestoreSdk";
 
-const balanceDocRequestSchema = z.object({
-  id: z.string(),
-  uid: z.string(),
-  value: z.number(),
-  currentUploadIntentNumber: z.number(),
-  uploadIntentIds: z.record(z.string(), z.boolean()),
-  createdAt: adminTimestampSchema,
-  updatedAt: adminTimestampSchema,
-});
-export type TBalanceDocRequest = z.infer<typeof balanceDocRequestSchema>;
+const balanceDocAdminRequestSchema = balanceDocSchema.merge(
+  z.object({
+    createdAt: adminTimestampSchema,
+    updatedAt: adminTimestampSchema,
+  })
+);
+export type TBalanceDocAdminRequest = z.infer<typeof balanceDocAdminRequestSchema>;
 
-const paymentIntentDocSchema = z.object({
-  id: z.string(),
-  uid: z.string(),
-  isAccountDebitted: z.boolean(),
-  createdAt: adminTimestampSchema,
-  updatedAt: adminTimestampSchema,
-});
-export type TPaymentIntentDoc = z.infer<typeof paymentIntentDocSchema>;
+const paymentIntentDocAdminRequestSchema = paymentIntentDocSchema.merge(
+  z.object({
+    createdAt: adminTimestampSchema,
+    updatedAt: adminTimestampSchema,
+  })
+);
+export type TPaymentIntentDoc = z.infer<typeof paymentIntentDocAdminRequestSchema>;
 
 const getBalanceDoc = async (p: { admin: typeof adminSdk; id: string }) => {
   try {
@@ -51,7 +48,6 @@ const setBalanceDoc = async (p: { admin: typeof adminSdk; data: TBalanceDoc }) =
     return { success: true } as const;
   } catch (e) {
     const error = e as { message: string };
-    console.log(`adminFirestoreSdk.ts:${/*LL*/ 67}`, { error });
     return fail({ error });
   }
 };
@@ -64,7 +60,7 @@ const getPaymentIntentDoc = async (p: { admin: typeof adminSdk; id: string }) =>
       .doc(p.id)
       .get();
 
-    return paymentIntentDocSchema.safeParse(initDoc.data());
+    return paymentIntentDocAdminRequestSchema.safeParse(initDoc.data());
   } catch (e) {
     const error = e as { message: string };
     return fail({ error });

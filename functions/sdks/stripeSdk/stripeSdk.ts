@@ -40,23 +40,6 @@ const createPaymentIntent = async (p: {
     return fail({ error });
   }
 };
-export const fulfillPaymentIntent = async (p: {
-  stripe: Stripe;
-  paymentIntentId: string;
-  // data:
-}): Promise<TSuccessOrFail<z.infer<typeof paymentIntentSchema>>> => {
-  try {
-    const paymentIntent = await p.stripe.paymentIntents.update(p.paymentIntentId, {
-      payment_method: "",
-    });
-    console.log(`stripeSdk.ts:${/*LL*/ 62}`, { paymentIntent });
-
-    return paymentIntentSchema.safeParse(paymentIntent);
-  } catch (e) {
-    const error = e as { message: string };
-    return fail({ error });
-  }
-};
 
 export const stripeSdk = {
   retrievePaymentIntent,
