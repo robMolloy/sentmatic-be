@@ -1,5 +1,5 @@
-import { timestampSchema } from "../../functionsSdk/createTestDocFunctionSdk";
 import z from "zod";
+import { timestampSchema } from "../../utils/firestoreUtils/firestoreUtils";
 
 const balanceDocSchema = z.object({
   id: z.string(),

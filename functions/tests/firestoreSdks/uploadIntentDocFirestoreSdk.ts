@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { timestampSchema } from "../../functionsSdk/createTestDocFunctionSdk";
+import { timestampSchema } from "../../utils/firestoreUtils/firestoreUtils";
 
 const uploadIntentDocSchema = z.object({
   id: z.string(),

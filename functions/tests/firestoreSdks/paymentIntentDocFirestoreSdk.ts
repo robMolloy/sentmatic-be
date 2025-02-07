@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { timestampSchema } from "../../functionsSdk/createTestDocFunctionSdk";
+import { timestampSchema } from "../../utils/firestoreUtils/firestoreUtils";
 
 export const paymentIntentDocSchema = z.object({
   id: z.string(),

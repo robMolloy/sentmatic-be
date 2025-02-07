@@ -1,1 +1,2 @@
-export * from "./createTestDocRoute";
+export * from "./createStripePaymentIntentRoute";
+export * from "./confirmSuccessfulStripePaymentAndUpdateBalanceDocRoute";
