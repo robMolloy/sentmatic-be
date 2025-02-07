@@ -1,10 +1,10 @@
 # sentmatic-be
 
-1. create back-end functionality that allows a user to create a stripe paymentIntent
-2. create front-end functionality that allows a user to get a paymentIntent from the back-end
-3. create front-end functionality that allows a user to make a card payment to fulfill a payment
-4. create front-end functionality that allows a user to provide the paymentIntentId to the back-end
-5. create back-end functionality that takes the paymentIntentId and increment the user's balance if the successful paymentIntent hasn't already been used then update the paymentFulfilledDocument
+- [x] create back-end functionality that allows a user to create a stripe paymentIntent
+- [ ] create front-end functionality that allows a user to get a paymentIntent from the back-end
+- [ ] create front-end functionality that allows a user to make a card payment to fulfill a payment
+- [ ] create front-end functionality that allows a user to provide the paymentIntentId to the back-end
+- [x] create back-end functionality that takes the paymentIntentId and increment the user's balance if the successful paymentIntent hasn't already been used then update the paymentIntentDoc to accountDebited:true
 
 ## payment flow
 
