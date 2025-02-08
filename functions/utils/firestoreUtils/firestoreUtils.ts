@@ -15,17 +15,21 @@ export const creatifyDoc = <T extends object>(obj: T) => {
   return { ...obj, createdAt: serverTimestamp(), updatedAt: serverTimestamp() };
 };
 
-export const updatifyDoc = <T extends object>(object: T) => {
-  return { ...object, updatedAt: serverTimestamp() };
+const getTimestampFromTimestampValue = (x: TTimestampValue) => {
+  return new Timestamp(x.seconds, x.nanoseconds);
+};
+
+export const updatifyDoc = <T extends { createdAt: TTimestampValue }>(object: T) => {
+  return {
+    ...object,
+    createdAt: getTimestampFromTimestampValue(object.createdAt),
+    updatedAt: serverTimestamp(),
+  };
 };
 
 export const getNotNowTimestamp = () => {
   const now = Timestamp.now();
   return { ...now, nanoseconds: now.nanoseconds - 1 };
-};
-
-const getTimestampFromTimestampValue = (x: TTimestampValue) => {
-  return new Timestamp(x.seconds, x.nanoseconds);
 };
 
 export const timestampSchema = z
