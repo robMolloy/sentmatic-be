@@ -6,6 +6,18 @@
 - [ ] create front-end functionality that allows a user to provide the paymentIntentId to the back-end
 - [x] create back-end functionality that takes the paymentIntentId and increment the user's balance if the successful paymentIntent hasn't already been used then update the paymentIntentDoc to accountDebited:true
 
+## FE SDK
+
+1. createStripePaymentIntent (functions)
+2. createPaymentIntentDoc (firestore - paymentIntentDoc:create)
+3. confirmUserOwnsUnpaidPaymentIntentDoc (firestore - paymentIntentDoc:get)
+4. uploadDoc (firestore - balance:update, fileDocs:create, storage - files:create)
+
+## FE progression SDK
+
+- [NMP] fulfillStripePaymentIntent (stripe)
+- ~~refundFailedUploadDoc (stripe:refund, firestore - balance:update, files:delete)~~
+
 ## payment flow
 
 - user creates a paymentIntent

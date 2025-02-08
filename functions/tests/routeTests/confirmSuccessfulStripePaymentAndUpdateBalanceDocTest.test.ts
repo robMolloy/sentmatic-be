@@ -21,7 +21,7 @@ describe("confirmSuccessfulStripePaymentAndUpdateBalanceDoc", () => {
   });
   it("route should return a success response and update balanceDoc", async () => {
     const uid = "test123";
-    const paymentIntentId = "pi_3QnJlyIGFJRyk0Rh0wsj1vKD";
+    const paymentIntentId = "pi_3Qq5ENIGFJRyk0Rh1jdQqaVH";
 
     await testEnv.withSecurityRulesDisabled(async (context) => {
       const fs = context.firestore();
@@ -50,7 +50,7 @@ describe("confirmSuccessfulStripePaymentAndUpdateBalanceDoc", () => {
   });
   it("route should return a success response on first run and fail on second run", async () => {
     const uid = "test123";
-    const paymentIntentId = "pi_3QnJlyIGFJRyk0Rh0wsj1vKD";
+    const paymentIntentId = "pi_3Qq5ENIGFJRyk0Rh1jdQqaVH";
 
     await testEnv.withSecurityRulesDisabled(async (context) => {
       const fs = context.firestore();

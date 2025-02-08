@@ -24,7 +24,12 @@ export const confirmSuccessfulStripePaymentAndUpdateBalanceDocRoute = onCall(asy
     id: paymentIntentId,
   });
   if (!paymentIntentResponse.success)
-    return fail({ error: { message: "could not find paymentIntent" } });
+    return fail({
+      error: {
+        message: `could not find paymentIntent: ${paymentIntentId}`,
+        details: paymentIntentResponse.error.message,
+      },
+    });
 
   const paymentIntentDocResponse = await adminFirestoreSdk.getPaymentIntentDoc({
     admin,
