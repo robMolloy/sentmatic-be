@@ -1,16 +1,9 @@
 {
   "name": "functions",
   "scripts": {
-    "lint": "eslint --ext .js,.ts .",
-    "serve": "npm run build && firebase emulators:start --only functions",
-    "shell": "npm run build && firebase functions:shell",
-    "start": "npm run shell",
-    "deploy": "firebase deploy --only functions",
-    "logs": "firebase functions:log",
-    "build:watch": "tsc --watch",
-    "functions:build": "npm run build:watch",
-    "firebase:emulator": "node_modules/.bin/firebase emulators:start --project demo-project --only auth,firestore,functions,storage",
     "firebase:init": "node_modules/.bin/firebase init",
+    "functions:build": "node_modules/.bin/tsc --watch",
+    "firebase:emulator": "node_modules/.bin/firebase emulators:start --project demo-project --only auth,firestore,functions,storage",
     "test:watch": "jest --watchAll --detectOpenHandles",
     "dev1": "npm run functions:build",
     "dev2": "npm run firebase:emulator",

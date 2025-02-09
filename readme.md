@@ -1,8 +1,9 @@
-# sentmatic-be
+# Sentmatic-be
 
-## getting started
+## Getting started
 
-- `npm i`
+### Install emulators
+
 - if you have never used the firebase emulator before (the following is just to install the emulator);
   - delete `.firebaserc` file
   - `firebase init` which should start the CLI wizard
@@ -11,6 +12,10 @@
   - select `Authentication`, `Functions`, `Firestore` and `Storage` then proceed
   - select `Y` for all other prompts
   - once complete use git to revert all changes
+
+### Install dependencies
+
+- `npm i`
 - `npm run dev1` to build the functions (wait for this to build the lib directory)
 - `npm run dev2` to start the emulator
 - (optional) `npm run dev3` to run the tests
@@ -35,7 +40,7 @@
 - [NMP] fulfillStripePaymentIntent (stripe)
 - ~~refundFailedUploadDoc (stripe:refund, firestore - balance:update, files:delete)~~
 
-## payment flow
+## Payment flow
 
 - user creates a paymentIntent
 - user fulfills paymentIntent
@@ -54,7 +59,7 @@
   - update balanceDoc by paymentIntent.amount
   - update paymentIntentDoc.accountDebitted == true
 
-## create file flow
+## Create file flow
 
 - user updates their balanceDoc;
   - decreases value by cost (300)
