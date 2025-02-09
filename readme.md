@@ -1,5 +1,22 @@
 # sentmatic-be
 
+## getting started
+
+- `npm i`
+- if you have never used the firebase emulator before (the following is just to install the emulator);
+  - delete `.firebaserc` file
+  - `firebase init` which should start the CLI wizard
+  - select `emulators` then proceed
+  - select `Don't set up a default project` then proceed
+  - select `Authentication`, `Functions`, `Firestore` and `Storage` then proceed
+  - select `Y` for all other prompts
+  - once complete use git to revert all changes
+- `npm run dev1` to build the functions (wait for this to build the lib directory)
+- `npm run dev2` to start the emulator
+- (optional) `npm run dev3` to run the tests
+
+## BE/FE checklist
+
 - [x] create back-end functionality that allows a user to create a stripe paymentIntent
 - [ ] create front-end functionality that allows a user to get a paymentIntent from the back-end
 - [ ] create front-end functionality that allows a user to make a card payment to fulfill a payment
