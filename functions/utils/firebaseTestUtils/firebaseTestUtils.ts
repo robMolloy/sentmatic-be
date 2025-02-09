@@ -17,6 +17,11 @@ export const createTestEnvironment = async (p: { projectId: string }) => {
       host: "127.0.0.1",
       port: 8080,
     },
+    storage: {
+      rules: readFileSync(path.resolve("./storage/storage.rules"), "utf8"),
+      host: "127.0.0.1",
+      port: 9199,
+    },
   });
 };
 
