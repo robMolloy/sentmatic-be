@@ -2,8 +2,8 @@
   "name": "functions",
   "scripts": {
     "lint": "eslint --ext .js,.ts .",
-    "functions:build": "tsc",
-    "functions:build:watch": "tsc --watch",
+    "functions:build": "node_modules/.bin/tsc",
+    "functions:build:watch": "node_modules/.bin/tsc --watch",
     "firebase:emulator": "node_modules/.bin/firebase emulators:start --project demo-project --only auth,firestore,functions,storage",
     "serve": "npm run build && firebase emulators:start --only functions",
     "shell": "npm run build && firebase functions:shell",
