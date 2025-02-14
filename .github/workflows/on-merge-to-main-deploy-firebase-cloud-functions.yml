@@ -24,8 +24,7 @@ jobs:
           credentials_json: '${{ secrets.FIREBASE_SERVICE_ACCOUNT_SENTMATIC_8F347 }}'
 
       - name: Install dependencies
-        run: |
-          npm ci
+        run: npm ci
 
       - name: Deploy to Firebase
         run: node_modules/.bin/firebase deploy --only functions --token '${{ secrets.FIREBASE_DEPLOY_TOKEN_SENTMATIC_8F347 }}'
