@@ -28,8 +28,11 @@ jobs:
 
       - name: Install dependencies
         run: |
-          cd functions
-          npm install
+          npm ci
+      
+      - name: Build cloud functions
+        run: |
+          npm run functions:build
 
       - name: Deploy to Firebase
         run: firebase deploy --only functions
