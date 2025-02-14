@@ -6,12 +6,12 @@
     "noImplicitReturns": true,
     "noUnusedLocals": true,
     "outDir": "lib",
+    "baseUrl": "./functions/src/routes",
     "sourceMap": true,
     "strict": true,
     "skipLibCheck": true,
     "target": "es2017"
   },
   "compileOnSave": true,
-  "include": ["."],
-  "exclude": ["node_modules"]
+  "include": ["."]
 }

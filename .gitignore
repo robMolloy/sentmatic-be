@@ -1,15 +1,3 @@
-# Compiled JavaScript files
-lib
-lib/**/*.js
-lib/**/*.js.map
-
-# TypeScript v1 declaration files
-typings/
-
-# Node.js dependency directory
-node_modules/
-*.local
-
 # Logs
 logs
 *.log
@@ -57,7 +45,7 @@ bower_components
 build/Release
 
 # Dependency directories
-**/node_modules/
+node_modules/
 
 # Optional npm cache directory
 .npm
@@ -79,8 +67,4 @@ build/Release
 
 # dataconnect generated files
 .dataconnect
-
-caches/history/*
-!caches/history/.gitkeep
-**/service-account.json
-.DS_Store
+lib/
